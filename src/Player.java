@@ -10,10 +10,9 @@ public class Player {
     private boolean onCard;
 
     //constructor
-    public Player(String name, int rank, Room room) {
+    public Player(String name) {
         this.name = name;
-        this.rank = rank;
-        this.room = room; //starts in trailer
+        this.rank = 1;
     }
 
     public void act() {
