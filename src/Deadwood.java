@@ -5,7 +5,7 @@ public class Deadwood {
     static Stack<Card> deck = new Stack<>();
     static List<Player> players = new ArrayList<>();
     static List<Room> rooms = new ArrayList<>();
-    static int DAYS = 4;
+    static int days = 4;
     static int cardsOnBoard = 10;
     static int playerCount = 0;
     public static void main(String[] args){
@@ -13,7 +13,7 @@ public class Deadwood {
 
         addPlayers();
 
-        while(DAYS > 0){
+        while(days > 0){
 
 
             while(cardsOnBoard > 1){
@@ -28,7 +28,7 @@ public class Deadwood {
             }
 
 
-            DAYS--;
+            days--;
         }
         displayTotalScores();
 
@@ -57,12 +57,13 @@ public class Deadwood {
                 players.get(i).setCredits(2);
             } else if (playerCount == 6) {
                 players.get(i).setCredits(4);
-            } else if (playerCount >=7 ) {
+            } else if (playerCount >= 7) {
                 players.get(i).setRank(2);
             }
         }
+
         if (playerCount <= 3) {
-            DAYS = 3;
+            days = 3;
         }
     }
 
@@ -76,7 +77,7 @@ public class Deadwood {
     }
 
     public static void displayCurrentScores(Player player) {
-
+        //display all stats about player for text based rendition
     }
 
     public static void displayTotalScores() {
@@ -84,7 +85,24 @@ public class Deadwood {
     }
 
     public static void takeTurn(Player player) {
+        System.out.printf("%s it's your turn to play. Choosing an invalid action will result in your turn ending.%n", player.getName());
 
+        if(player.hasRole()){
+            System.out.println("You're currently acting in a role. Would you like to act, rehearse, or nothing?");
+            String choice = scanner.next();
+            if(choice.equals("act")){
+                act();
+            }
+            else if(choice.equals("rehearse")){
+                rehearse();
+            }
+            else{
+                System.out.println("Your turn is over.");
+            }
+        }
+        else{
+            System.out.println("Would you like to move")
+        }
 
     }
 
