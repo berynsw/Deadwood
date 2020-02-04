@@ -6,24 +6,43 @@ public class Deadwood {
     static List<Player> players = new ArrayList<>();
     static List<Room> rooms = new ArrayList<>();
     static int DAYS = 4;
+    static int cardsOnBoard = 10;
+    static int playerCount = 0;
     public static void main(String[] args){
 
 
         addPlayers();
-        //Create rooms by parsing XML
-        //create cards by parsing XML
 
-        //new ArrayList<>(Arrays.asList(new Role("prisoner in cell", 2, false), new Role("prisoner in cell", 2, false)))
-        //list.add(new Role("prisoner in cell", 2, false));
+        while(DAYS > 0){
 
-        //Set
+
+            while(cardsOnBoard > 1){
+
+                for (int i = 0; i < playerCount; i++) {
+                    players.get(i).takeTurn();
+                }
+            }
+
+
+
+            DAYS--;
+        }
+        displayScores();
+
+
+
+
     }
 
+
+    // Adds players to the game
+    // Updates credits, rank, or number of days based on
+    // number of players.
     public static void addPlayers(){
         //create scanner
         Scanner scan = new Scanner(System.in);
         System.out.println("Pick number of players (2-8): ");
-        int playerCount = scan.nextInt();
+        playerCount = scan.nextInt();
 
         //check correct number of players
         assert (playerCount >= 2 && playerCount <= 8): "Invalid number of players.";
