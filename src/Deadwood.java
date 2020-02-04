@@ -19,18 +19,18 @@ public class Deadwood {
             while(cardsOnBoard > 1){
 
                 for (int i = 0; i < playerCount; i++) {
-                    players.get(i).takeTurn();
+                    if (cardsOnBoard == 1) {            //checks if day is over during player rotation
+                        break;
+                    }
+                    takeTurn(players.get(i));
+
                 }
             }
 
 
-
             DAYS--;
         }
-        displayScores();
-
-
-
+        displayTotalScores();
 
     }
 
@@ -73,6 +73,19 @@ public class Deadwood {
     public static void createRooms(){
         //parse room details from xml (including offCard roles)
         //add rooms to list of rooms
+    }
+
+    public static void displayCurrentScores(Player player) {
+
+    }
+
+    public static void displayTotalScores() {
+
+    }
+
+    public static void takeTurn(Player player) {
+
+
     }
 
 
