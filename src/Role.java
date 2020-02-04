@@ -10,4 +10,38 @@ public class Role {
         this.onCard = onCard;
         this.filled = false;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    public boolean isFilled() {
+        return filled;
+    }
+
+    public void setFilled(boolean filled) {
+        this.filled = filled;
+    }
+
+    public boolean isOnCard() {
+        return onCard;
+    }
+
+    public void setOnCard(boolean onCard) {
+        this.onCard = onCard;
+    }
+
+
 }
