@@ -1,4 +1,3 @@
-import java.util.*;
 public class Player {
     private String name;
     private int rank;
@@ -11,11 +10,22 @@ public class Player {
     private boolean onCard;
 
     //constructor
-    public Player(String name, int rank, Room room, Role role) {
+    public Player(String name, int rank, Room room) {
         this.name = name;
         this.rank = rank;
-        this.room = room;
-        this.role = role;
+        this.room = room; //starts in trailer
+    }
+
+    public void act() {
+    }
+
+    public void rehearse(){
+    }
+
+    public void upgrade() {
+    }
+
+    public void move() {
     }
 
     public String getName() {
