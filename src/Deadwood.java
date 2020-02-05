@@ -122,11 +122,39 @@ public class Deadwood {
             }
             else if(room.equals("casting office")){
                 System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to end.");
+                String choice = scan.nextLine();
+                if(choice.equals("yes")){
+                    upgrade();
+                }
+
+                System.out.println("Would you like to display adjacent rooms? Type 'yes' or anything else to end.");
+                String choice = scan.nextLine();
+                if(choice.equals("yes")){
+                    
+                    displayRoomOptions();
+                }
+
+
+                System.out.println("Would you like to move? Type 'yes' or anything else to end.");
+                String choice = scan.nextLine();
+                if(choice.equals("yes")){
+
+                    move();
+                }
+            }
+            else{
+                System.out.println("? Type 'yes' or anything else to end.");
             }
 
 
+
+            //if player wants to upgrade at end of turn
             if(room.equals("casting office")){
                 System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to end.");
+                String choice = scan.nextLine();
+                if(choice.equals("yes")){
+                    upgrade();
+                }
             }
 
         }
