@@ -87,21 +87,48 @@ public class Deadwood {
     public static void takeTurn(Player player) {
         System.out.printf("%s it's your turn to play. Choosing an invalid action will result in your turn ending.%n", player.getName());
 
+        Scanner scan = new Scanner(System.in);
+
+        //case for acting in role
         if(player.hasRole()){
-            System.out.println("You're currently acting in a role. Would you like to act, rehearse, or nothing?");
-            String choice = scanner.next();
+            System.out.println("You're currently acting in a role. Your options are: 'act', 'rehearse'. Type anything else to end turn.");
+            String choice = scan.nextLine();
+
             if(choice.equals("act")){
                 act();
             }
             else if(choice.equals("rehearse")){
-                rehearse();
+                player.setRehearsalTokens(player.getRehearsalTokens() + 1);
             }
             else{
                 System.out.println("Your turn is over.");
             }
         }
+        //case for moving, taking role, upgrading
         else{
-            System.out.println("Would you like to move")
+
+            String room = player.getRoom().getName();
+
+//            if(room.equals("casting office")){
+//                System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to continue to the move option.");
+//            }
+
+            if(room.equals("trailer")){
+                System.out.println("You're in the trailer. Your only option is to 'move'. Type anything else to end.");
+                String choice = scan.nextLine();
+                if(choice.equals("move")){
+                    move();
+                }
+            }
+            else if(room.equals("casting office")){
+                System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to end.");
+            }
+
+
+            if(room.equals("casting office")){
+                System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to end.");
+            }
+
         }
 
     }
