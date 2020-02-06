@@ -11,7 +11,7 @@ public class Deadwood {
     public static void main(String[] args){
 
         //get number of players from args
-        int playerCount;
+        
         try{
             playerCount = Integer.parseInt(args[0]);
         }
@@ -53,16 +53,15 @@ public class Deadwood {
             System.out.printf("Enter player %d's name: \n", i+1);
             String name = scan.next();
             players.add(new Player(name));
-
             if (playerCount == 5) {
                 players.get(i).setCredits(2);
-            } else if (playerCount == 6) {
+            if (playerCount == 6) {
                 players.get(i).setCredits(4);
-            } else if (playerCount >= 7) {
+            }
+            if (playerCount >= 7) {
                 players.get(i).setRank(2);
             }
         }
-
         if (playerCount <= 3) {
             days = 3;
         }
@@ -100,84 +99,74 @@ public class Deadwood {
 
 
 
+        
+    
+        
+        
+        
     public static void takeTurn(Player player) {
-        System.out.printf("%s it's your turn to play. Choosing an invalid action will result in your turn ending.%n", player.getName());
+        System.out.printf("%s it's your turn to play.%n", player.getName());
 
         Scanner scan = new Scanner(System.in);
-
-        //case for acting in role
-        if(player.hasRole()){
-            System.out.println("You're currently acting in a role. Options are: 'act', 'rehearse', or type anything else to end turn.");
-
-            String choice = scan.nextLine();
-            if(choice.equals("act")){
-                act();
+        
+        boolean turn = true;
+        String input;
+        while(turn){ //need to flip turn boolean where appropriate
+            input = scan.nextLine();
+            if(input.equals("end"){
+                turn = false;
             }
-            if(choice.equals("rehearse")){
+            else if(input.equals("active player"){
+                displayCurrentScores(player);
+            }
+            else if(input.equals("all players"){
+                for(int i = 0; i < playerCount; i++){
+                    if(players.get(i) == player){
+                        System.out.println("Active player: ");
+                    }
+                    displayCurrentScores(players.get(i));
+                }
+            }
+            else if(input.equals("move"){
+                if(player.hasRole()){
+                    System.out.println("You can't move right now. Options are act, rehearse, or end.");
+                }
+                else{
+                    move(); //need to prompt user where to move and check that it's adjacent
+                }
+            }
+            else if(input.equals("work"){
+                if(player.hasRole()){
+                    System.out.println("You're already working. Options are act, rehearse, or end.");
+                }
+                else{
+                    takeRole(); //need to check if there are compatible roles in room
+                }
+            }
+            else if(input.equals("act"){
+                if(!player.hasRole()){
+                    System.out.println("You're not working yet.");
+                }
+                else{
+                    act(); //need to check on or off card, etc.
+                }
+            }
+            else if(input.equals("rehearse"){
                 player.setRehearsalTokens(player.getRehearsalTokens() + 1);
             }
-
-        }
-        //case for moving, taking role, upgrading
-        else{
-            String room = player.getRoom().getName();
-
-            //in trailer only option is move
-            if(room.equals("trailer")){
-                displayCurrentScores(player);
-                displayRooms(player.getRoom());
-                System.out.println("Would you like to move? Type 'yes' or anything else to end.");
-                String choice = scan.nextLine();
-                if(choice.equals("yes")){
-                    move(); //will need more nested cases in here..
-                    takeRole();
+            else if(input.equals("upgrade"){
+                if(player.getRoom().getName().equals("casting office")){
+                    upgrade(); //need to prompt user for rank and currency
+                }
+                else{
+                    System.out.println("You need to be in the casting office to upgrade.");
                 }
             }
-            //in casting office option to upgrade and then move
-            else if(room.equals("casting office")){
-                displayCurrentScores(player);
-                displayRanks();
-                System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to continue.");
-                String choice = scan.nextLine();
-                if(choice.equals("yes")){
-                    upgrade();
-                }
-                displayRooms(player.getRoom());
-                System.out.println("Would you like to move out of the casting office? Type 'yes' to move or anything else to end.");
-                choice = scan.nextLine();
-                if(choice.equals("yes")){
-                    move(); //will need more nested cases in here..
-                    takeRole();
-                }
-            }
-            //in any set option is takerole or move
             else{
-                displayCurrentScores(player);
-                displayRooms(player.getRoom());
-                System.out.println("Options are: 'take role', 'move', or anything else to end.");
-                String choice = scan.nextLine();
-                if(choice.equals("take role")){
-                    takeRole();
-                }
-                if(choice.equals("move")){
-                    move(); //will need more nested cases in here..
-                    takeRole();
-                }
-            }
-
-            //if player wants to upgrade at end of turn
-            if(room.equals("casting office")){
-                displayCurrentScores(player);
-                displayRanks();
-                System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to end.");
-                String choice = scan.nextLine();
-                if(choice.equals("yes")){
-                    upgrade();
-                }
-            }
-        }
+                System.out.println("Unrecognized input. The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'");
+            }                        
+        }               
         System.out.println("Turn ended.");
-
     }
 
 
