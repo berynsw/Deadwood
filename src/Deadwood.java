@@ -10,43 +10,44 @@ public class Deadwood {
     static int playerCount = 0;
     public static void main(String[] args){
 
+        //get number of players from args
+        int playerCount;
+        try{
+            playerCount = Integer.parseInt(args[0]);
+        }
+        catch(Exception e){
+            System.out.println("Must provide an integer number of players");
+        }
+        addPlayers(playerCount);
 
-        addPlayers();
-
+        
+        
         while(days > 0){
-
-
             while(cardsOnBoard > 1){
-
                 for (int i = 0; i < playerCount; i++) {
+                    takeTurn(players.get(i));
                     if (cardsOnBoard == 1) {            //checks if day is over during player rotation
                         break;
-                    }
-                    takeTurn(players.get(i));
-
+                    }                    
                 }
             }
-
-
             days--;
         }
         displayTotalScores();
-
     }
 
 
     // Adds players to the game
     // Updates credits, rank, or number of days based on
     // number of players.
-    public static void addPlayers(){
-        //create scanner
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Pick number of players (2-8): ");
-        playerCount = scan.nextInt();
-
+    public static void addPlayers(int playerCount){
+         
         //check correct number of players
         assert (playerCount >= 2 && playerCount <= 8): "Invalid number of players.";
 
+        //create scanner
+        Scanner scan = new Scanner(System.in);
+        
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
             System.out.printf("Enter player %d's name: \n", i+1);
