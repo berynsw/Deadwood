@@ -76,6 +76,19 @@ public class Deadwood {
         //add rooms to list of rooms
     }
 
+    public static void displayRooms(Room current){
+        //display rooms with cards, roles and which ones are adjacent to current room
+    }
+
+    public static void displayRoles(Room current){
+        //display roles in given room
+    }
+
+    public static void displayRanks(){
+        //display ranks that are possible to upgrade to
+        //with associated currency
+    }
+
     public static void displayCurrentScores(Player player) {
         //display all stats about player for text based rendition
     }
@@ -83,6 +96,8 @@ public class Deadwood {
     public static void displayTotalScores() {
 
     }
+
+
 
     public static void takeTurn(Player player) {
         System.out.printf("%s it's your turn to play. Choosing an invalid action will result in your turn ending.%n", player.getName());
@@ -92,72 +107,72 @@ public class Deadwood {
         //case for acting in role
         if(player.hasRole()){
             System.out.println("You're currently acting in a role. Your options are: 'act', 'rehearse'. Type anything else to end turn.");
-            String choice = scan.nextLine();
 
+            String choice = scan.nextLine();
             if(choice.equals("act")){
                 act();
             }
-            else if(choice.equals("rehearse")){
+            if(choice.equals("rehearse")){
                 player.setRehearsalTokens(player.getRehearsalTokens() + 1);
             }
-            else{
-                System.out.println("Your turn is over.");
-            }
+
         }
         //case for moving, taking role, upgrading
         else{
 
             String room = player.getRoom().getName();
 
-//            if(room.equals("casting office")){
-//                System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to continue to the move option.");
-//            }
 
             if(room.equals("trailer")){
-                System.out.println("You're in the trailer. Your only option is to 'move'. Type anything else to end.");
+
+                displayRooms(player.getRoom());
+                System.out.println("Would you like to move? Type 'yes' or anything else to end.");
                 String choice = scan.nextLine();
-                if(choice.equals("move")){
+                if(choice.equals("yes")){
                     move();
                 }
             }
             else if(room.equals("casting office")){
-                System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to end.");
+                displayRanks();
+                displayCurrentScores(player);
+                System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to continue.");
                 String choice = scan.nextLine();
                 if(choice.equals("yes")){
                     upgrade();
                 }
 
-                System.out.println("Would you like to display adjacent rooms? Type 'yes' or anything else to end.");
-                String choice = scan.nextLine();
+                displayRooms(player.getRoom());
+                System.out.println("Would you like to move out of the casting office? Type 'yes' to move or anything else to end.");
+                choice = scan.nextLine();
                 if(choice.equals("yes")){
-                    
-                    displayRoomOptions();
-                }
-
-
-                System.out.println("Would you like to move? Type 'yes' or anything else to end.");
-                String choice = scan.nextLine();
-                if(choice.equals("yes")){
-
                     move();
                 }
             }
             else{
-                System.out.println("? Type 'yes' or anything else to end.");
+                displayRooms(player.getRoom());
+
+                System.out.println("Options are: 'take role', 'move', or anything else to end.");
+                String choice = scan.nextLine();
+                if(choice.equals("take role")){
+                    takeRole();
+                }
+                if(choice.equals("move")){
+                    move();
+                }
             }
-
-
 
             //if player wants to upgrade at end of turn
             if(room.equals("casting office")){
+                displayRanks();
+                displayCurrentScores(player);
                 System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to end.");
                 String choice = scan.nextLine();
                 if(choice.equals("yes")){
                     upgrade();
                 }
             }
-
         }
+        System.out.println("Turn ended.");
 
     }
 
