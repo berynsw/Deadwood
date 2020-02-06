@@ -15,18 +15,6 @@ public class Player {
         this.rank = 1;
     }
 
-    public void act() {
-    }
-
-    public void rehearse(){
-    }
-
-    public void upgrade() {
-    }
-
-    public void move() {
-    }
-
     public String getName() {
         return name;
     }
@@ -83,7 +71,7 @@ public class Player {
         this.role = role;
     }
 
-    public boolean isHasRole() {
+    public boolean getHasRole() {
         return hasRole;
     }
 
@@ -98,4 +86,5 @@ public class Player {
     public void setOnCard(boolean onCard) {
         this.onCard = onCard;
     }
+
 }

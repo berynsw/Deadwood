@@ -10,11 +10,9 @@ public class Deadwood {
     static int playerCount = 0;
     public static void main(String[] args){
 
-
-        addPlayers();
+        initGame();
 
         while(days > 0){
-
 
             while(cardsOnBoard > 1){
 
@@ -23,17 +21,12 @@ public class Deadwood {
                         break;
                     }
                     takeTurn(players.get(i));
-
                 }
             }
-
-
             days--;
         }
-        displayTotalScores();
-
+        displayTotalScores(players);
     }
-
 
     // Adds players to the game
     // Updates credits, rank, or number of days based on
@@ -42,10 +35,19 @@ public class Deadwood {
         //create scanner
         Scanner scan = new Scanner(System.in);
         System.out.println("Pick number of players (2-8): ");
-        playerCount = scan.nextInt();
 
-        //check correct number of players
-        assert (playerCount >= 2 && playerCount <= 8): "Invalid number of players.";
+        //check valid input type
+        if (scan.hasNextInt()) {
+            playerCount = scan.nextInt();
+        } else {
+            System.out.println("That is not a number.");
+        }
+
+        //check valid number of players
+        if (playerCount < 2 || playerCount > 8) {
+            System.out.println("Invalid number of players.");
+            System.exit(0);
+        }
 
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
@@ -93,10 +95,30 @@ public class Deadwood {
         //display all stats about player for text based rendition
     }
 
-    public static void displayTotalScores() {
+    public static void displayTotalScores(List players) {
 
     }
 
+    private static void act() {
+
+    }
+
+    //probably unnecessary because rehearsing is simple
+    /*public static void rehearse(){
+
+    } */
+
+    private static void upgrade() {
+
+    }
+
+    private static void move() {
+
+    }
+
+    private static void takeRole() {
+
+    }
 
 
     public static void takeTurn(Player player) {
@@ -105,17 +127,16 @@ public class Deadwood {
         Scanner scan = new Scanner(System.in);
 
         //case for acting in role
-        if(player.hasRole()){
+        if(player.getHasRole()){
             System.out.println("You're currently acting in a role. Options are: 'act', 'rehearse', or type anything else to end turn.");
 
             String choice = scan.nextLine();
             if(choice.equals("act")){
                 act();
             }
-            if(choice.equals("rehearse")){
+            else if(choice.equals("rehearse") && player.getRehearsalTokens() < 5){ // checks if player has maximum # of tokens
                 player.setRehearsalTokens(player.getRehearsalTokens() + 1);
             }
-
         }
         //case for moving, taking role, upgrading
         else{
@@ -179,5 +200,22 @@ public class Deadwood {
 
     }
 
+    private static void initGame() {
+        //Initialize game
+        Scanner scan = new Scanner(System.in);
+        System.out.print("Welcome to Deadwood! Would you like to start a new game? (y/n)\n");
+        String startGame = scan.next();
+
+        //check input
+        if (!startGame.equalsIgnoreCase("y")) {
+            System.out.print("See you next time!");
+            System.exit(0);
+        } else if (startGame.equalsIgnoreCase("y")) {
+            addPlayers();
+        } else {
+            System.out.println("Invalid input.");
+            System.exit(0);
+        }
+    }
 
 }
