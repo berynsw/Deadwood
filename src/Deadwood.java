@@ -128,7 +128,8 @@ public class Deadwood {
                 System.out.println("Would you like to move? Type 'yes' or anything else to end.");
                 String choice = scan.nextLine();
                 if(choice.equals("yes")){
-                    move();
+                    move(); //will need more nested cases in here..
+                    takeRole();
                 }
             }
             //in casting office option to upgrade and then move
@@ -144,7 +145,8 @@ public class Deadwood {
                 System.out.println("Would you like to move out of the casting office? Type 'yes' to move or anything else to end.");
                 choice = scan.nextLine();
                 if(choice.equals("yes")){
-                    move();
+                    move(); //will need more nested cases in here..
+                    takeRole();
                 }
             }
             //in any set option is takerole or move
@@ -157,7 +159,8 @@ public class Deadwood {
                     takeRole();
                 }
                 if(choice.equals("move")){
-                    move();
+                    move(); //will need more nested cases in here..
+                    takeRole();
                 }
             }
 
