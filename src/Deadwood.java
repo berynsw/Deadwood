@@ -109,7 +109,7 @@ public class Deadwood {
 
         Scanner scan = new Scanner(System.in);
         
-        boolean turn = true;
+        boolean turn = true; // takeRole(), act(), rehearse() could return booleans to update this
         String input;
         while(turn){ //need to flip turn boolean where appropriate
             input = scan.nextLine();
@@ -135,7 +135,7 @@ public class Deadwood {
                     move(); //need to prompt user where to move and check that it's adjacent
                 }
             }
-            else if(input.equals("work"){
+            else if(input.equals("take role"){
                 if(player.hasRole()){
                     System.out.println("You're already working. Options are act, rehearse, or end.");
                 }
@@ -145,7 +145,7 @@ public class Deadwood {
             }
             else if(input.equals("act"){
                 if(!player.hasRole()){
-                    System.out.println("You're not working yet.");
+                    System.out.println("You're not working on a role yet.");
                 }
                 else{
                     act(); //need to check on or off card, etc.
@@ -163,7 +163,7 @@ public class Deadwood {
                 }
             }
             else{
-                System.out.println("Unrecognized input. The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'");
+                System.out.println("Unrecognized input. The options are: 'active player', 'all players', 'move', 'take role', 'rehearse', 'act', 'upgrade', and 'end'");
             }                        
         }               
         System.out.println("Turn ended.");
