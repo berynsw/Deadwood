@@ -106,7 +106,7 @@ public class Deadwood {
 
         //case for acting in role
         if(player.hasRole()){
-            System.out.println("You're currently acting in a role. Your options are: 'act', 'rehearse'. Type anything else to end turn.");
+            System.out.println("You're currently acting in a role. Options are: 'act', 'rehearse', or type anything else to end turn.");
 
             String choice = scan.nextLine();
             if(choice.equals("act")){
@@ -119,12 +119,11 @@ public class Deadwood {
         }
         //case for moving, taking role, upgrading
         else{
-
             String room = player.getRoom().getName();
 
-
+            //in trailer only option is move
             if(room.equals("trailer")){
-
+                displayCurrentScores(player);
                 displayRooms(player.getRoom());
                 System.out.println("Would you like to move? Type 'yes' or anything else to end.");
                 String choice = scan.nextLine();
@@ -132,15 +131,15 @@ public class Deadwood {
                     move();
                 }
             }
+            //in casting office option to upgrade and then move
             else if(room.equals("casting office")){
-                displayRanks();
                 displayCurrentScores(player);
+                displayRanks();
                 System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to continue.");
                 String choice = scan.nextLine();
                 if(choice.equals("yes")){
                     upgrade();
                 }
-
                 displayRooms(player.getRoom());
                 System.out.println("Would you like to move out of the casting office? Type 'yes' to move or anything else to end.");
                 choice = scan.nextLine();
@@ -148,9 +147,10 @@ public class Deadwood {
                     move();
                 }
             }
+            //in any set option is takerole or move
             else{
+                displayCurrentScores(player);
                 displayRooms(player.getRoom());
-
                 System.out.println("Options are: 'take role', 'move', or anything else to end.");
                 String choice = scan.nextLine();
                 if(choice.equals("take role")){
@@ -163,8 +163,8 @@ public class Deadwood {
 
             //if player wants to upgrade at end of turn
             if(room.equals("casting office")){
-                displayRanks();
                 displayCurrentScores(player);
+                displayRanks();
                 System.out.println("Since you're in the casting office would you like to upgrade? Type 'yes' or anything else to end.");
                 String choice = scan.nextLine();
                 if(choice.equals("yes")){
