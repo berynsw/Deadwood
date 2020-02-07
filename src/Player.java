@@ -13,19 +13,10 @@ public class Player {
     public Player(String name) {
         this.name = name;
         this.rank = 1;
+        this. rehearsalTokens = 0;
     }
 
-    public void act() {
-    }
-
-    public void rehearse(){
-    }
-
-    public void upgrade() {
-    }
-
-    public void move() {
-    }
+    
 
     public String getName() {
         return name;
@@ -83,7 +74,7 @@ public class Player {
         this.role = role;
     }
 
-    public boolean isHasRole() {
+    public boolean hasRole() {
         return hasRole;
     }
 
