@@ -3,20 +3,29 @@ import org.w3c.dom.Document;
 
 public class Deadwood {
 
-    static Stack<Card> deck = new Stack<>();
-    static List<Player> players = new ArrayList<>();
-    static List<Room> rooms = new ArrayList<>();
-    static int days = 4;
-    static int cardsOnBoard = 10;
-    static int playerCount = 0;
+
+
     public static void main(String[] args){
+        Stack<Card> deck = new Stack<>();
+        List<Player> players = new ArrayList<>();
+        List<Room> rooms = new ArrayList<>();
+        int days = 4;
+        int cardsOnBoard = 10;
+
+
 
         //populate rooms list
-        Document doc = null;
-        ParseRooms parsing = new ParseRooms();
+        Document doc1 = null;
+        Document doc2 = null;
+        ParseXML parsing = new ParseXML();
         try{
-            doc = parsing.getDocFromFile("board.xml");
-            parsing.readRoomData(doc, rooms);
+            doc1 = parsing.getDocFromFile("board.xml");
+            parsing.readRoomData(doc1, rooms);
+
+            doc2 = parsing.getDocFromFile("cards.xml");
+            parsing.readCardData(doc2, deck);
+
+
         }
         catch(Exception e){
             System.out.println("Error = "+e);
@@ -27,21 +36,12 @@ public class Deadwood {
         }
 
 
-        //get number of players from args
-        try{
-            playerCount = Integer.parseInt(args[0]);
-        }
-        catch(Exception e){
-            System.out.println("Must provide an integer number of players");
-        }
-        addPlayers(playerCount);
-
-        
+        addPlayers(args[0], players, days);
         
         while(days > 0){
             while(cardsOnBoard > 1){
-                for (int i = 0; i < playerCount; i++) {
-                    takeTurn(players.get(i));
+                for (int i = 0; i < players.size(); i++) {
+                    takeTurn(players.get(i), players);
                     if (cardsOnBoard == 1) {            //checks if day is over during player rotation
                         break;
                     }                    
@@ -56,7 +56,16 @@ public class Deadwood {
     // Adds players to the game
     // Updates credits, rank, or number of days based on
     // number of players.
-    public static void addPlayers(int playerCount) {
+    public static void addPlayers(String arg, List<Player> players, int days) {
+        //get number of players from args
+        int playerCount = 0;
+        try{
+            playerCount = Integer.parseInt(arg);
+        }
+        catch(Exception e){
+            System.out.println("Must provide an integer number of players");
+        }
+
 
         //check correct number of players
         //check valid number of players
@@ -139,7 +148,7 @@ public class Deadwood {
 
 
 
-    public static void takeTurn(Player player) {
+    public static void takeTurn(Player player, List<Player> players) {
         System.out.printf("%s it's your turn to play.%n", player.getName());
 
         Scanner scan = new Scanner(System.in);
@@ -155,7 +164,7 @@ public class Deadwood {
                 displayCurrentScores(player);
             }
             else if(input.equals("all players")){
-                for(int i = 0; i < playerCount; i++){
+                for(int i = 0; i < players.size(); i++){
                     if(players.get(i) == player){
                         System.out.println("Active player: ");
                     }

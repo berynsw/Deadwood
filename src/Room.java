@@ -2,23 +2,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Room {
-    List<Room> adjacents = new ArrayList<>();
+    List<String> adjacents = new ArrayList<>();
     String name;
+    boolean isSet;
 
 
-
-    public Room(String name) {
+    public Room(String name, List<String> adj, boolean set) {
         this.name = name;
+        this.adjacents = adj;
+        this.isSet = set;
     }
 
     public Room() {
     }
 
-    public List<Room> getAdjacents() {
+    public boolean isSet() {
+        return isSet;
+    }
+
+    public void setSet(boolean isSet) {
+        this.isSet = isSet;
+    }
+
+    public List<String> getAdjacents() {
         return adjacents;
     }
 
-    public void setAdjacents(List<Room> adjacents) {
+    public void addAdjacent(String adjacent) {
+        this.adjacents.add(adjacent);
+    }
+
+    public void setAdjacents(List<String> adjacents){
         this.adjacents = adjacents;
     }
 

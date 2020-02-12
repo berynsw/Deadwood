@@ -6,11 +6,13 @@ public class Set extends Room{
     List<Role> roles = new ArrayList<>();
     Card card;
 
-    public Set(String name, int shots, List<Role> roles, Card card){
+    public Set(String name, int shots, List<Role> roles, List<String> adjacents, boolean set){
         this.name = name;
         this.maxShots = shots;
         this.currentShots = maxShots;
         this.roles = roles;
+        this.adjacents = adjacents;
+        this.isSet = set;
     }
 
     public int getMaxShots() {
