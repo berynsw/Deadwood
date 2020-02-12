@@ -1,4 +1,5 @@
 import java.util.*;
+import org.w3c.dom.Document;
 
 public class Deadwood {
 
@@ -10,8 +11,23 @@ public class Deadwood {
     static int playerCount = 0;
     public static void main(String[] args){
 
+        //populate rooms list
+        Document doc = null;
+        ParseRooms parsing = new ParseRooms();
+        try{
+            doc = parsing.getDocFromFile("board.xml");
+            parsing.readRoomData(doc, rooms);
+        }
+        catch(Exception e){
+            System.out.println("Error = "+e);
+        }
+
+        for(int i = 0; i < rooms.size(); i++){
+            System.out.println("room name: " + rooms.get(i).getName());
+        }
+
+
         //get number of players from args
-        
         try{
             playerCount = Integer.parseInt(args[0]);
         }
