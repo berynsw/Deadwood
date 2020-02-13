@@ -1,4 +1,3 @@
-import java.net.StandardSocketOptions;
 import java.util.*;
 import org.w3c.dom.Document;
 
@@ -31,6 +30,11 @@ public class Deadwood {
         catch(Exception e){
             System.out.println("Error = "+e);
         }
+
+        for(int i = 0; i < rooms.size(); i++){
+            System.out.println("room name: " + rooms.get(i).getName());
+        }
+
 
         addPlayers(args[0], players, days);
         
@@ -78,7 +82,6 @@ public class Deadwood {
             System.out.printf("Enter player %d's name: \n", i + 1);
             String name = scan.next();
             players.add(new Player(name));
-
             if (playerCount <= 3) {
                 days = 3;
             } else if (playerCount == 5) {
@@ -91,14 +94,7 @@ public class Deadwood {
         }
     }
 
-    public static void createCards(){
-        //parse cards from xml (including onCard roles)
-        //add cards to deck
-    }
-    public static void createRooms(){
-        //parse room details from xml (including offCard roles)
-        //add rooms to list of rooms
-    }
+
 
     public static void displayRooms(Room current){
         //display rooms with cards, roles and which ones are adjacent to current room
@@ -165,12 +161,17 @@ public class Deadwood {
                     displayCurrentScores(players.get(i));
                 }
             }
-            else if(input.equals("move")){
+            else if(input.substring(0,4).equals("move")){
                 if(player.hasRole()){
                     System.out.println("You can't move right now. Options are act, rehearse, or end.");
                 }
                 else{
-                    move(player); //need to prompt user where to move and check that it's adjacent
+
+//                    move(player); //need to prompt user where to move and check that it's adjacent
+//                    String move = input.substring(4);
+//                    List<String> neighbors = player.getRoom().getAdjacents();
+//                    if(isNeighbor(neighbors, ))
+
                 }
             }
             else if(input.equals("take role")){
@@ -211,6 +212,15 @@ public class Deadwood {
             }                        
         }               
         System.out.println("Turn ended.");
+    }
+
+    public static boolean isNeighbor(List<String> neighbors, String room){
+        for(int i = 0; i < neighbors.size(); i++){
+            if(neighbors.get(i).equals(room)){
+                return true;
+            }
+        }
+        return false;
     }
 
 
