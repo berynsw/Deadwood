@@ -78,17 +78,15 @@ public class Deadwood {
             System.out.printf("Enter player %d's name: \n", i + 1);
             String name = scan.next();
             players.add(new Player(name));
-            if (playerCount == 5) {
-                players.get(i).setCredits(2);
-                if (playerCount == 6) {
-                    players.get(i).setCredits(4);
-                }
-                if (playerCount >= 7) {
-                    players.get(i).setRank(2);
-                }
-            }
+
             if (playerCount <= 3) {
                 days = 3;
+            } else if (playerCount == 5) {
+                players.get(i).setCredits(2);
+            } else if (playerCount == 6) {
+                players.get(i).setCredits(4);
+            } else if (playerCount >= 7) {
+                players.get(i).setRank(2);
             }
         }
     }
