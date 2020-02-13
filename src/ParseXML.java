@@ -65,14 +65,12 @@ public class ParseXML{
                             if("neighbor".equals(n.getNodeName())){
                                 String s = n.getAttributes().getNamedItem("name").getNodeValue();
                                 neighbors.add(s);
-                                System.out.println("neighbor: "+s);
                             }
                             //parts
                             if("part".equals(n.getNodeName())){
                                 String s = n.getAttributes().getNamedItem("name").getNodeValue();
                                 int rank = Integer.parseInt(n.getAttributes().getNamedItem("level").getNodeValue());
                                 roles.add(new Role(s, rank, false));
-                                System.out.println("part: "+s);
                             }
                             //takes
                             if("take".equals(n.getNodeName())){
@@ -82,7 +80,6 @@ public class ParseXML{
                     }
                     //add a new room
                     rooms.add(new Set(setName, shots, roles, neighbors, true));
-                    System.out.println("shots: "+shots);
                 }
                 else if("office".equals(room.getNodeName())){
                     //children
@@ -97,7 +94,6 @@ public class ParseXML{
                             if("neighbor".equals(n.getNodeName())){
                                 String s = n.getAttributes().getNamedItem("name").getNodeValue();
                                 neighbors.add(s);
-                                System.out.println("neighbor: "+s);
                             }
                         }
                     }
@@ -116,17 +112,11 @@ public class ParseXML{
                             if("neighbor".equals(n.getNodeName())){
                                 String s = n.getAttributes().getNamedItem("name").getNodeValue();
                                 neighbors.add(s);
-                                System.out.println("neighbor: "+s);
                             }
                         }
                     }
                     rooms.add(new Room("trailer", neighbors, false));
                 }
-                else{
-                    System.out.println("Error, unrecognized room!");
-                }
-
-                System.out.println();
             }
 
         }// method
@@ -140,11 +130,14 @@ public class ParseXML{
 
             //Parse through all the cards in the xml
             for (int i = 0; i < cards.getLength(); i++) {
+
                 Node card = cards.item(i);
                 String cardName = card.getAttributes().getNamedItem("name").getNodeValue();
                 String b = card.getAttributes().getNamedItem("budget").getNodeValue();
                 int budget = Integer.parseInt(b);
-                System.out.printf("Card Name = %s, Budget = %d", cardName, budget);
+
+                //Card c = new Card(cardName, budget, );
+                List<Role> roles = new ArrayList<>();
 
                 NodeList children = card.getChildNodes();
 
@@ -155,15 +148,18 @@ public class ParseXML{
                     if ("part".equals(sub.getNodeName())) {
                         String roleName = sub.getAttributes().getNamedItem("name").getNodeValue();
                         String l = sub.getAttributes().getNamedItem("level").getNodeValue();
-                        int level = Integer.parseInt(l);
+                        int rank = Integer.parseInt(l);
 
-                        System.out.printf("    Role = %s, Level = %d\n", roleName, level);
+                        Role r = new Role(roleName, rank, true);
+                        roles.add(r);
+
                     } else if ("scene".equals(sub.getNodeName())) {
                         String scene = sub.getAttributes().getNamedItem("number").getNodeValue();
                         int sceneNumber = Integer.parseInt(scene);
-                        System.out.printf(", Scene = %d\n",sceneNumber);
                     }
                 }
+                Card c = new Card(cardName, roles, budget);
+                deck.add(c);
             }
         }
 

@@ -1,3 +1,4 @@
+import java.net.StandardSocketOptions;
 import java.util.*;
 import org.w3c.dom.Document;
 
@@ -30,11 +31,6 @@ public class Deadwood {
         catch(Exception e){
             System.out.println("Error = "+e);
         }
-
-        for(int i = 0; i < rooms.size(); i++){
-            System.out.println("room name: " + rooms.get(i).getName());
-        }
-
 
         addPlayers(args[0], players, days);
         
@@ -130,11 +126,11 @@ public class Deadwood {
     public static void act() {
     }
 
-    public static boolean upgrade() {
+    public static boolean upgrade(Player player) {
         return true;
     }
 
-    public static boolean move() {
+    public static boolean move(Player player) {
         return true;
     }
 
@@ -176,7 +172,7 @@ public class Deadwood {
                     System.out.println("You can't move right now. Options are act, rehearse, or end.");
                 }
                 else{
-                    move(); //need to prompt user where to move and check that it's adjacent
+                    move(player); //need to prompt user where to move and check that it's adjacent
                 }
             }
             else if(input.equals("take role")){
@@ -206,7 +202,7 @@ public class Deadwood {
             }
             else if(input.equals("upgrade")){
                 if(player.getRoom().getName().equals("casting office")){
-                    upgrade(); //need to prompt user for rank and currency
+                    upgrade(player); //need to prompt user for rank and currency
                 }
                 else{
                     System.out.println("You need to be in the casting office to upgrade.");
