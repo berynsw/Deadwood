@@ -126,10 +126,7 @@ public class Deadwood {
         }
     }
 
-    public static void displayRanks(){
-        //display ranks that are possible to upgrade to
-        //with associated currency
-    }
+
 
     public static void displayCurrentStats(Player player) {
         System.out.printf("name: %s%n", player.getName());
@@ -219,6 +216,23 @@ public class Deadwood {
 
     }
 
+    //return the list of rooms adjacent to the current location
+    // cases for if the current room is trailer office or set
+    public static List<String> getNeighbors(String room, HashMap<String, Set> sets, Room trailer, Room office){
+        if(room.equalsIgnoreCase("trailer")){
+            return trailer.getAdjacents();
+        }
+        else if(room.equalsIgnoreCase("office")){
+            return office.getAdjacents();
+        }
+        else if(sets.get(room) != null){
+            return sets.get(room).getAdjacents();
+        }
+        else{
+            System.out.println("invalid room/location string in player");
+            return null;
+        }
+    }
 
 
     public static void takeTurn(Player player, List<Player> players, HashMap<String, Set> sets, Room trailer, Room office) {
@@ -246,22 +260,30 @@ public class Deadwood {
                     System.out.println();
                 }
             }
-            else if(input.substring(0,4).equalsIgnoreCase("move")){ //done
+            else if(input.equalsIgnoreCase("move")){ //done
                 if(player.hasRole()){
                     System.out.println("You can't move right now. Options are act, rehearse, or end.");
                 }
                 else{
-                    String move = input.substring(4).toLowerCase();
-                    List<String> neighbors = sets.get(player.getRoom()).getAdjacents();
+
+
+                    System.out.println("The neighboring rooms to your current room are:");
+                    List<String> neighbors = getNeighbors(input, sets, trailer, office);
+                    for(String room : neighbors){
+                        System.out.println(" "+room);
+                    }
+
+                    System.out.println("Where would you like to move to?");
+                    input = scan.nextLine().toLowerCase();
+
                     //check if the move request is a neighboring room
-                    if(neighbors.contains(move)){
-                        player.setRoom(move);
+                    if(neighbors.contains(input)){
+                        player.setRoom(input);
                         //if it's a set
-                        if(sets.containsKey(move)){
-                            Set set = sets.get(move);
-                            work(player, set, scan);
+                        if(sets.containsKey(input)){
+                            work(player, sets.get(input), scan);
                         }
-                        else if(move.equals("office")){
+                        else if(input.equals("office")){
                             System.out.println("Since you moved to the office would you like to upgrade?");
                             upgrade(player, scan);
                         }
@@ -332,7 +354,7 @@ public class Deadwood {
                 }
             }
             else{
-                System.out.println("Unrecognized input. The options are: 'active player', 'all players', 'move roomName', 'work', 'rehearse', 'act', 'upgrade', and 'end'");
+                System.out.println("Unrecognized input. The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'");
             }                        
         }               
         System.out.println("Turn ended.");
