@@ -4,7 +4,7 @@ public class Player {
     private int credits;
     private int dollars;
     private int rehearsalTokens;
-    private Room room;
+    private String room;
     private Role role;
     private boolean hasRole;
     private boolean onCard;
@@ -13,7 +13,7 @@ public class Player {
     public Player(String name) {
         this.name = name;
         this.rank = 1;
-        this. rehearsalTokens = 0;
+        this.rehearsalTokens = 0;
     }
 
     
@@ -58,11 +58,11 @@ public class Player {
         this.rehearsalTokens = rehearsalTokens;
     }
 
-    public Room getRoom() {
+    public String getRoom() {
         return room;
     }
 
-    public void setRoom(Room room) {
+    public void setRoom(String room) {
         this.room = room;
     }
 

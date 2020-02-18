@@ -9,8 +9,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import java.io.File;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -30,28 +31,80 @@ public class ParseXML{
            }
            return doc;
 
-        }  
-        
-        // reads data from XML file and prints data
-        public static void readRoomData(Document d, List<Room> rooms){
-            Element root = d.getDocumentElement();
+        }
 
+        // returns office
+        public static Room readOfficeData(Document d) {
+            Element root = d.getDocumentElement();
             //each room
             NodeList roomNodes = root.getChildNodes();
+            List<String> neighbors = new ArrayList<>();
+            for (int i = 0; i < roomNodes.getLength(); i++) {
+                Node room = roomNodes.item(i);
+                if("office".equals(room.getNodeName())){
+                    //children
+                    NodeList children = room.getChildNodes();
+                    for (int j=0; j< children.getLength(); j++){
+                        Node sub = children.item(j);
+                        NodeList subsub = sub.getChildNodes();
+                        for (int k=0; k< subsub.getLength(); k++){
+                            Node n = subsub.item(k);
 
+                            //neighbors
+                            if("neighbor".equals(n.getNodeName())){
+                                String s = n.getAttributes().getNamedItem("name").getNodeValue().toLowerCase();
+                                neighbors.add(s);
+                            }
+                        }
+                    }
+                }
+            }
+            return new Room("office", neighbors, false);
+        }
+
+    // returns office
+    public static Room readTrailerData(Document d) {
+        Element root = d.getDocumentElement();
+        //each room
+        NodeList roomNodes = root.getChildNodes();
+        List<String> neighbors = new ArrayList<>();
+        for (int i = 0; i < roomNodes.getLength(); i++) {
+            Node room = roomNodes.item(i);
+            if("trailer".equals(room.getNodeName())){
+                //children
+                NodeList children = room.getChildNodes();
+                for (int j=0; j< children.getLength(); j++){
+                    Node sub = children.item(j);
+                    NodeList subsub = sub.getChildNodes();
+                    for (int k=0; k< subsub.getLength(); k++){
+                        Node n = subsub.item(k);
+
+                        //neighbors
+                        if("neighbor".equals(n.getNodeName())){
+                            String s = n.getAttributes().getNamedItem("name").getNodeValue().toLowerCase();
+                            neighbors.add(s);
+                        }
+                    }
+                }
+            }
+        }
+        return new Room("trailer", neighbors, false);
+    }
+
+        // populates set data
+        public static HashMap<String, Set> readSetData(Document d){
+            HashMap<String, Set> sets = new HashMap<>();
+            Element root = d.getDocumentElement();
+            //each room
+            NodeList roomNodes = root.getChildNodes();
             for (int i=0; i<roomNodes.getLength();i++){
                 Node room = roomNodes.item(i);
 
-
-
                 List<String> neighbors = new ArrayList<>();
-
-
                 //sets
                 if("set".equals(room.getNodeName())){
                     //name
-
-                    String setName = room.getAttributes().getNamedItem("name").getNodeValue();
+                    String setName = room.getAttributes().getNamedItem("name").getNodeValue().toLowerCase();
                     List<Role> roles = new ArrayList<>();
                     int shots = 0;
                     NodeList setChild = room.getChildNodes();
@@ -60,15 +113,14 @@ public class ParseXML{
                         NodeList subsub = sub.getChildNodes();
                         for (int k=0; k< subsub.getLength(); k++){
                             Node n = subsub.item(k);
-
                             //neighbors
                             if("neighbor".equals(n.getNodeName())){
-                                String s = n.getAttributes().getNamedItem("name").getNodeValue();
+                                String s = n.getAttributes().getNamedItem("name").getNodeValue().toLowerCase();
                                 neighbors.add(s);
                             }
                             //parts
                             if("part".equals(n.getNodeName())){
-                                String s = n.getAttributes().getNamedItem("name").getNodeValue();
+                                String s = n.getAttributes().getNamedItem("name").getNodeValue().toLowerCase();
                                 int rank = Integer.parseInt(n.getAttributes().getNamedItem("level").getNodeValue());
                                 roles.add(new Role(s, rank, false));
                             }
@@ -79,47 +131,11 @@ public class ParseXML{
                         }
                     }
                     //add a new room
-                    rooms.add(new Set(setName, shots, roles, neighbors, true));
-                }
-                else if("office".equals(room.getNodeName())){
-                    //children
-                    NodeList children = room.getChildNodes();
-                    for (int j=0; j< children.getLength(); j++){
-                        Node sub = children.item(j);
-                        NodeList subsub = sub.getChildNodes();
-                        for (int k=0; k< subsub.getLength(); k++){
-                            Node n = subsub.item(k);
-
-                            //neighbors
-                            if("neighbor".equals(n.getNodeName())){
-                                String s = n.getAttributes().getNamedItem("name").getNodeValue();
-                                neighbors.add(s);
-                            }
-                        }
-                    }
-                    rooms.add(new Room("office", neighbors, false));
-                }
-                else if("trailer".equals(room.getNodeName())){
-                    //children
-                    NodeList children = room.getChildNodes();
-                    for (int j=0; j< children.getLength(); j++){
-                        Node sub = children.item(j);
-                        NodeList subsub = sub.getChildNodes();
-                        for (int k=0; k< subsub.getLength(); k++){
-                            Node n = subsub.item(k);
-
-                            //neighbors
-                            if("neighbor".equals(n.getNodeName())){
-                                String s = n.getAttributes().getNamedItem("name").getNodeValue();
-                                neighbors.add(s);
-                            }
-                        }
-                    }
-                    rooms.add(new Room("trailer", neighbors, false));
+                    sets.put(setName, new Set(setName, shots, roles, neighbors, true));
                 }
             }
-
-        }// method
+            return sets;
+        }
 
 
 

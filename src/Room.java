@@ -7,6 +7,8 @@ public class Room {
     boolean isSet;
 
 
+
+
     public Room(String name, List<String> adj, boolean set) {
         this.name = name;
         this.adjacents = adj;
