@@ -6,8 +6,6 @@ public class Player {
     private int rehearsalTokens;
     private String room;
     private Role role;
-    private boolean hasRole;
-    private boolean onCard;
 
     //constructor
     public Player(String name) {
@@ -73,20 +71,5 @@ public class Player {
     public void setRole(Role role) {
         this.role = role;
     }
-
-    public boolean hasRole() {
-        return hasRole;
-    }
-
-    public void setHasRole(boolean hasRole) {
-        this.hasRole = hasRole;
-    }
-
-    public boolean isOnCard() {
-        return onCard;
-    }
-
-    public void setOnCard(boolean onCard) {
-        this.onCard = onCard;
-    }
+    
 }

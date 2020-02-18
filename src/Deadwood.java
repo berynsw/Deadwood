@@ -39,16 +39,28 @@ public class Deadwood {
             System.out.println("Error = "+e);
         }
 
-        for(String name : sets.keySet()){
-            System.out.println("room name: " + name);
+        for(Set set : sets.values()){
+            System.out.println("room name: " + set.getName());
+            for(String neb : set.getAdjacents()){
+                System.out.println(" neb: "+neb);
+            }
+        }
+
+        System.out.println("trailer name: " + trailer.getName());
+        for(String name : trailer.getAdjacents()){
+            System.out.println(" neb: "+name);
         }
         System.out.println("office name: " + office.getName());
-        System.out.println("trailer name: " + trailer.getName());
+        for(String name : office.getAdjacents()){
+            System.out.println(" neb: "+name);
+        }
+        System.out.println();
 
 
         addPlayers(args[0], players, days);
         
         while(days > 0){
+            initDay(players, sets, deck);
             while(cardsOnBoard > 1){
                 for (int i = 0; i < players.size(); i++) {
                     takeTurn(players.get(i), players, sets, trailer, office);
@@ -62,6 +74,19 @@ public class Deadwood {
         displayTotalScores();
     }
 
+    //puts the players in trailer and puts a card from the deck into every set
+    public static void initDay(List<Player> players, HashMap<String,Set> sets, Stack<Card> deck){
+        //put all players in trailer
+        for(Player player : players){
+            player.setRoom("trailer");
+            player.setRole(null);
+        }
+
+        //put a card in every set
+        sets.forEach((name, set) -> {
+            set.setCard(deck.pop());
+        });
+    }
 
     // Adds players to the game
     // Updates credits, rank, or number of days based on
@@ -102,6 +127,7 @@ public class Deadwood {
                 players.get(i).setRank(2);
             }
         }
+        System.out.println();
     }
 
 
@@ -119,7 +145,7 @@ public class Deadwood {
             }
         }
         System.out.printf(" On card: %n");
-        for(Role role : offCard){
+        for(Role role : onCard){
             if(!role.isFilled()){
                 System.out.printf("  name: %s rank required: %d%n", role.getName(), role.getRank());
             }
@@ -202,8 +228,15 @@ public class Deadwood {
         for(Role role : roles){
             if(input.equalsIgnoreCase(role.getName())){
                 if(player.getRank() >= role.getRank()){
-                    player.setRole(role);
-                    System.out.printf("You took %s!%n", role.getName());
+                    if(!role.isFilled()){
+                        player.setRole(role);
+                        role.setFilled(true);
+                        System.out.printf("You took %s!%n", role.getName());
+                    }
+                    else{
+                        System.out.printf("That role is already filled.%n");
+                    }
+
                 }
                 else{
                     System.out.println("You're not high enough rank");
@@ -213,7 +246,13 @@ public class Deadwood {
     }
 
     public static void work(Player player, Set set, Scanner scan){
-
+        List<Role> offCard = set.getRoles();
+        List<Role> onCard = set.getCard().getRoles();
+        displayRoles(offCard, onCard);
+        System.out.println("If you would like to work on one of these roles type the role 'name', otherwise your turn will end.");
+        String input = scan.nextLine().toLowerCase();
+        takeRole(player, offCard, input);
+        takeRole(player, onCard, input);
     }
 
     //return the list of rooms adjacent to the current location
@@ -237,13 +276,13 @@ public class Deadwood {
 
     public static void takeTurn(Player player, List<Player> players, HashMap<String, Set> sets, Room trailer, Room office) {
         System.out.printf("%s it's your turn to play.%n", player.getName());
-
         Scanner scan = new Scanner(System.in);
-        
         boolean turn = true; // takeRole(), act(), rehearse() could return booleans to update this
         String input;
 
+
         while(turn){
+            System.out.printf("The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'.%n");
             input = scan.nextLine();
             if(input.equalsIgnoreCase("end")){
                 turn = false;
@@ -261,14 +300,14 @@ public class Deadwood {
                 }
             }
             else if(input.equalsIgnoreCase("move")){ //done
-                if(player.hasRole()){
-                    System.out.println("You can't move right now. Options are act, rehearse, or end.");
+                if(player.getRole() != null){
+                    System.out.println("You acting in a role and can't move. Options are act, rehearse, or end.");
                 }
                 else{
 
 
                     System.out.println("The neighboring rooms to your current room are:");
-                    List<String> neighbors = getNeighbors(input, sets, trailer, office);
+                    List<String> neighbors = getNeighbors(player.getRoom(), sets, trailer, office);
                     for(String room : neighbors){
                         System.out.println(" "+room);
                     }
@@ -279,9 +318,15 @@ public class Deadwood {
                     //check if the move request is a neighboring room
                     if(neighbors.contains(input)){
                         player.setRoom(input);
+                        System.out.println("You successfully moved to "+input);
                         //if it's a set
                         if(sets.containsKey(input)){
-                            work(player, sets.get(input), scan);
+                            if(sets.get(input).getCard() != null){
+                                work(player, sets.get(input), scan);
+                            }
+                            else{
+                                System.out.println("This set is wrapped. You can't work here today.");
+                            }
                         }
                         else if(input.equals("office")){
                             System.out.println("Since you moved to the office would you like to upgrade?");
@@ -299,20 +344,14 @@ public class Deadwood {
                     System.out.println("You're not in a set. You must move to a set to work.");
                 }
                 else{
-                    if(player.hasRole()){
+                    if(player.getRole() != null){
                         System.out.println("You're already working. Options are act, rehearse, or end.");
                     }
                     else{
                         Set set = sets.get(player.getRoom());
                         //if the set is active
                         if(set.getCard() != null){
-                            List<Role> offCard = set.getRoles();
-                            List<Role> onCard = set.getCard().getRoles();
-                            displayRoles(offCard, onCard);
-                            System.out.println("If you would like to work on one of these roles type the role 'name', otherwise your turn will end.");
-                            input = scan.nextLine().toLowerCase();
-                            takeRole(player, offCard, input);
-                            takeRole(player, onCard, input);
+                            work(player, sets.get(player.getRoom()), scan);
                             turn = false;
                         }
                         else{
@@ -322,19 +361,21 @@ public class Deadwood {
                 }
             }
             else if(input.equalsIgnoreCase("act")){
-                if(!player.hasRole()){
+                if(player.getRole() == null){
                     System.out.println("You're not working on a role yet.");
                 }
                 else{
                     //act(); //need to check on or off card, etc.
+
                     turn = false;
                 }
             }
             else if(input.equalsIgnoreCase("rehearse")){ //done
-                if(player.hasRole()){
+                if(player.getRole() != null){
                     int budget = sets.get(player.getRoom()).getCard().getBudget();
                     if(player.getRehearsalTokens() < budget-1) {
                         player.setRehearsalTokens(player.getRehearsalTokens() + 1);
+                        System.out.println("+1 practice chips!");
                         turn = false;
                     }
                     else{
@@ -354,10 +395,10 @@ public class Deadwood {
                 }
             }
             else{
-                System.out.println("Unrecognized input. The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'");
+                System.out.println("Unrecognized input.");
             }                        
         }               
-        System.out.println("Turn ended.");
+        System.out.printf("%s's turn ended.%n%n",player.getName());
     }
 
 
