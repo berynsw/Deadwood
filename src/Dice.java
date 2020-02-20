@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class Dice {
 
     private int value = getDiceVal();
@@ -7,7 +9,8 @@ public class Dice {
     }
 
     private int rollDice() {
-        return -1; // DUMMY VALUE
+        Random r = new Random();
+        return r.nextInt(6) + 1;
     }
 
     private int getDiceVal() {

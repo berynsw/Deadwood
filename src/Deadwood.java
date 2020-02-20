@@ -1,14 +1,18 @@
+import java.sql.SQLOutput;
 import java.util.*;
 import org.w3c.dom.Document;
 
 public class Deadwood {
 
-
-    static int[] RANK = {2,3,4,5,6};
-    static int[] DOLLAR_COST = {4,10,18,28,40};
-    static int[] CREDIT_COST = {5,10,15,20,25};
+    //Initialize earnings
+    static private int[] RANK = {2,3,4,5,6};
+    static private int[] DOLLAR_COST = {4,10,18,28,40};
+    static private int[] CREDIT_COST = {5,10,15,20,25};
+    static final String LINE = "----------------------------------------------";
+    //static private List<Player> players = new ArrayList<>();
 
     public static void main(String[] args){
+        //initialize room/card data structure
         Stack<Card> deck = new Stack<>();
         List<Player> players = new ArrayList<>();
         HashMap<String,Set> sets = new HashMap<>();
@@ -20,8 +24,8 @@ public class Deadwood {
 
 
         //populate rooms list
-        Document doc1 = null;
-        Document doc2 = null;
+        Document doc1;
+        Document doc2;
         ParseXML parsing = new ParseXML();
         try{
             //rooms
@@ -119,6 +123,12 @@ public class Deadwood {
             players.add(new Player(name));
             if (playerCount <= 3) {
                 days = 3;
+
+
+                players.get(i).setRank(6);
+
+
+
             } else if (playerCount == 5) {
                 players.get(i).setCredits(2);
             } else if (playerCount == 6) {
@@ -141,13 +151,13 @@ public class Deadwood {
         System.out.printf(" Off card: %n");
         for(Role role : offCard){
             if(!role.isFilled()){
-                System.out.printf("  name: %s rank required: %d%n", role.getName(), role.getRank());
+                System.out.printf("  name: %s, rank required: %d%n", role.getName(), role.getRank());
             }
         }
         System.out.printf(" On card: %n");
         for(Role role : onCard){
             if(!role.isFilled()){
-                System.out.printf("  name: %s rank required: %d%n", role.getName(), role.getRank());
+                System.out.printf("  name: %s, rank required: %d%n", role.getName(), role.getRank());
             }
         }
     }
@@ -166,7 +176,153 @@ public class Deadwood {
 
     }
 
-    public static void act() {
+    private static void payOut(List<Player> p, Set set) {
+        //initialize an arraylist of players that are on the set
+        List<Player> playersOnSet = new ArrayList<>();
+        List<Player> playersOnCard = new ArrayList<>();
+        List<Player> playersOffCard = new ArrayList<>();
+        List<Integer> dice = new ArrayList<>();
+        Random r = new Random();
+
+        //generate list of dice rolls equivalent to the budget of the movie
+        int budget = set.getCard().getBudget();
+        for (int i = 0; i < budget; i++) {
+            dice.add(r.nextInt(6)+1);
+        }
+
+        //sort dice arrayList
+        Collections.sort(dice);
+
+        //add all players on set into arraylist
+        for (int j = 0; j < p.size(); j++) {
+            if (set.getName().equals(p.get(j).getRoom())) {
+                playersOnSet.add(p.get(j));
+            }
+        }
+
+        //for all players on the set, add them to onCard or offCard arraylists
+        for (Player player : playersOnSet) {
+            if (player.getRole().isOnCard()) {
+                playersOnCard.add(player);
+
+            } else {
+                playersOffCard.add(player);
+            }
+        }
+
+        //initialize static set of onCard players
+        List<Player> onCard = playersOnCard;
+
+        //only payout players if there is at least 1 player working onCard
+        if(playersOnCard.size() > 0) {
+
+            //offCard players receive dollars equal to the rank of their role
+            for (Player player : playersOffCard) {
+                int reward = player.getRole().getRank();
+                player.setDollars(player.getDollars() + reward);
+                System.out.printf("%s receives %d dollars and now has %d dollars.\n",
+                        player.getName(), player.getRole().getRank(), player.getDollars());
+            }
+
+            Player highestRole;
+            while (!dice.isEmpty()) {
+
+                //if we payout each player, reset the arraylist of Oncard players and do it again
+                if (playersOnCard.isEmpty()) {
+                    playersOnCard = onCard;
+                }
+
+                //find player with highest role on card
+                //Player highestRole = playersOnCard.get(0);
+
+                highestRole = onCard.get(0);
+
+                for (Player player : playersOnCard) {
+                    if (player.getRole().getRank() >= highestRole.getRole().getRank()) {
+                        highestRole = player;
+                    }
+                }
+                
+                // give highest ranking player a dollar equivalent of the highest die roll,
+                // then remove highestPlayer and highest die from arrayList
+
+                System.out.printf("%s receives %d dollars and now has %d dollars.\n",
+                        highestRole.getName(), dice.get(dice.size()-1), (highestRole.getDollars() + dice.get(dice.size()-1)));
+                highestRole.setDollars(highestRole.getDollars() + dice.remove(dice.size()-1));
+                playersOnCard.remove(highestRole);
+            }
+        }
+        System.out.println(LINE);
+    }
+
+    public static void act(Player player, Set set, List<Player> players) {
+
+        Random r = new Random();
+        int roll = r.nextInt(6) + 1;
+        int budget = set.getCard().getBudget();
+
+        if (set.getCurrentShots() == 1) {
+            System.out.println("There is 1 shot left.");
+        } else {
+            System.out.println("There are " + set.getCurrentShots() + " shots left.");
+        }
+
+
+        System.out.printf("You need to roll a %d...\n", budget);
+        System.out.printf("You rolled a %d!\n", roll);
+        if (budget > roll) {
+            System.out.println("Apparently, you're not as good an actor as you think.");
+
+            //if failed off-card, still get a dollar
+            if (!player.getRole().isOnCard()) {
+                player.setDollars(player.getDollars() + 1);
+                System.out.println("As compensation, you get 1 dollar.");
+            } else {
+                System.out.println("As compensation, you get nothing. Better luck next time!");
+            }
+
+
+            //decrement shot counter
+            if (set.currentShots > 1) {
+                set.setCurrentShots(set.currentShots - 1);
+            } else {
+                System.out.println("That about wraps it up, the scene is over!");
+                set.setCurrentShots(0);
+                System.out.println(LINE);
+                payOut(players, set);
+
+                //player is no longer in a role
+                for(Player p : players) {
+                    p.setRole(null);
+                }
+            }
+
+        } else {
+            System.out.println("It appears that you're not as bad an actor as you look!");
+
+            if (player.getRole().isOnCard()) {
+                player.setCredits(player.getCredits() + 2);
+                System.out.println("As compensation, you get 2 credits.");
+            } else {
+                player.setCredits(player.getCredits() + 1);
+                player.setDollars(player.getDollars() + 1);
+                System.out.println("As compensations, you get 1 dollar and 1 credit.");
+            }
+
+            if (set.currentShots > 1) {
+                set.setCurrentShots(set.currentShots - 1);
+            } else {
+                System.out.println("That about wraps it up, the scene is over!");
+                set.setCurrentShots(0);
+                System.out.println(LINE);
+                payOut(players, set);
+
+                //player is no longer in a role
+                for(Player p : players) {
+                    p.setRole(null);
+                }
+            }
+        }
     }
 
     public static void upgrade(Player player, Scanner scan) {
@@ -299,9 +455,13 @@ public class Deadwood {
                     System.out.println();
                 }
             }
+            else if(input.equalsIgnoreCase("act")) {
+                act(player, sets.get(player.getRoom()), players);
+                turn = false;
+            }
             else if(input.equalsIgnoreCase("move")){ //done
                 if(player.getRole() != null){
-                    System.out.println("You acting in a role and can't move. Options are act, rehearse, or end.");
+                    System.out.println("You are acting in a role and can't move. Options are act, rehearse, or end.");
                 }
                 else{
 
@@ -400,7 +560,5 @@ public class Deadwood {
         }               
         System.out.printf("%s's turn ended.%n%n",player.getName());
     }
-
-
 
 }

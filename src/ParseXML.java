@@ -18,7 +18,7 @@ import java.util.Stack;
 public class ParseXML{
         // building a document from the XML file
         // returns a Document object after loading the book.xml file.
-        public static Document getDocFromFile(String filename) throws ParserConfigurationException{
+        public Document getDocFromFile(String filename) throws ParserConfigurationException{
            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
            DocumentBuilder db = dbf.newDocumentBuilder();
            Document doc = null;
@@ -34,7 +34,7 @@ public class ParseXML{
         }
 
         // returns office
-        public static Room readOfficeData(Document d) {
+        public Room readOfficeData(Document d) {
             Element root = d.getDocumentElement();
             //each room
             NodeList roomNodes = root.getChildNodes();
@@ -63,7 +63,7 @@ public class ParseXML{
         }
 
     // returns office
-    public static Room readTrailerData(Document d) {
+    public Room readTrailerData(Document d) {
         Element root = d.getDocumentElement();
         //each room
         NodeList roomNodes = root.getChildNodes();
@@ -92,7 +92,7 @@ public class ParseXML{
     }
 
         // populates set data
-        public static HashMap<String, Set> readSetData(Document d){
+        public HashMap<String, Set> readSetData(Document d){
             HashMap<String, Set> sets = new HashMap<>();
             Element root = d.getDocumentElement();
             //each room
