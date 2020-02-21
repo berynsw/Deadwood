@@ -134,7 +134,7 @@ public class Deadwood {
 						}
 						displayCurrentStats(p);
 						System.out.println();
-                	}
+					}
 					break;
 				case "act":
 					if (player.getRole()!= null) {
