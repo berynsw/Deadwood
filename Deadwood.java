@@ -32,14 +32,12 @@ public class Deadwood {
             //cards
             doc2 = parsing.getDocFromFile("cards.xml");
             parsing.readCardData(doc2, deck);
-
-
         }
         catch(Exception e){
             System.out.println("Error = "+e);
         }
 
-        for(Set set : sets.values()){
+        /*for(Set set : sets.values()){
             System.out.println("room name: " + set.getName());
             for(String neb : set.getAdjacents()){
                 System.out.println(" neb: "+neb);
@@ -54,7 +52,8 @@ public class Deadwood {
         for(String name : office.getAdjacents()){
             System.out.println(" neb: "+name);
         }
-        System.out.println();
+        System.out.println();*/
+
 
 
         addPlayers(args[0], players, days);
@@ -70,7 +69,6 @@ public class Deadwood {
                 }
             }
             days--;
-            initDay(players, sets, deck);
         }
         displayTotalScores(players);
     }
@@ -121,12 +119,6 @@ public class Deadwood {
             players.add(new Player(name));
             if (playerCount <= 3) {
                 days = 3;
-
-
-                players.get(i).setRank(6);
-
-
-
             } else if (playerCount == 5) {
                 players.get(i).setCredits(2);
             } else if (playerCount == 6) {
@@ -171,18 +163,12 @@ public class Deadwood {
     }
 
     public static void displayTotalScores(List<Player> players){
-        Player winner = players.get(0);
+
         for(Player player : players) {
-          totalScore(player);
-
-          displayCurrentStats(player);
-
-          if (totalScore(winner) < totalScore(player)) {
-              winner = player;
-          }
+            System.out.printf("%s's total score: %d\n!",player.getName(), totalScore(player));
         }
 
-        System.out.printf("The winner, with a total score of %d, is %s!", totalScore(winner), winner.getName());
+        System.out.println(LINE);
     }
 
     public static int totalScore (Player player) {
@@ -221,11 +207,13 @@ public class Deadwood {
 
         //for all players on the set, add them to onCard or offCard arraylists
         for (Player player : playersOnSet) {
-            if (player.getRole().isOnCard()) {
-                playersOnCard.add(player);
+            if (player.getRole() != null) {
+                if (player.getRole().isOnCard()) {
+                    playersOnCard.add(player);
 
-            } else {
-                playersOffCard.add(player);
+                } else {
+                    playersOffCard.add(player);
+                }
             }
         }
 
@@ -326,6 +314,7 @@ public class Deadwood {
                 }
                 for (Player endPlayerRole : playersOnSet) {
                     endPlayerRole.setRole(null);
+                    endPlayerRole.setRehearsalTokens(0);
                 }
 
                 set.setCard(null);
