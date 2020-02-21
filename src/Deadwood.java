@@ -118,50 +118,51 @@ public class Deadwood {
 
         while(turn){
             System.out.printf("The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'.%n");
-            input = scan.nextLine();
-
-            if(input.equalsIgnoreCase("end")){
-                turn = false;
-            }
-            else if(input.equalsIgnoreCase("active player")){
-                displayCurrentStats(player);
-            }
-            else if(input.equalsIgnoreCase("all players")){
-                for(Player p : players){
-                    if(p == player){
-                        System.out.println("Active player: ");
-                    }
-                    displayCurrentStats(p);
-                    System.out.println();
-                }
-            }
-            else if(input.equalsIgnoreCase("act")) {
-                if (player.getRole()!= null) {
-                    act(player, sets.get(player.getRoom()), players);
-                    turn = false;
-                } else {
-                    System.out.println("You are not currently acting in a role.");
-                }
-            }
-            else if(input.equalsIgnoreCase("move")){ //done
-                turn = move(player, sets, trailer, office, scan);
-            }
-            else if(input.equalsIgnoreCase("work")){ //done
-                if(!sets.containsKey(player.getRoom())){
-                    System.out.println("You're not in a set. You must move to a set to work.");
-                }
-                else{
-                    turn = work(player, sets.get(player.getRoom()), scan);
-                }
-            }
-            else if(input.equalsIgnoreCase("rehearse")){ //done
-                turn = rehearse(player, sets);
-            }
-            else if(input.equalsIgnoreCase("upgrade")){
-                upgrade(office, player, scan);
-            }
-            else{
-                System.out.println("Unrecognized input.");
+            input = scan.nextLine().toLowerCase();
+            
+            switch(input){
+				case "end":
+					turn = false;
+					break;
+				case "active player":
+					displayCurrentStats(player);
+					break;
+				case "all players":
+					for(Player p : players){
+						if(p == player){
+							System.out.println("Active player: ");
+						}
+						displayCurrentStats(p);
+						System.out.println();
+                	}
+					break;
+				case "act":
+					if (player.getRole()!= null) {
+						act(player, sets.get(player.getRoom()), players);
+						turn = false;
+					} else {
+						System.out.println("You are not currently acting in a role.");
+					}
+					break;
+				case "move":
+					turn = move(player, sets, trailer, office, scan);
+					break;
+				case "work":
+					if(!sets.containsKey(player.getRoom())){
+                    	System.out.println("You're not in a set. You must move to a set to work.");
+					}
+					else{
+						turn = work(player, sets.get(player.getRoom()), scan);
+					}
+					break;
+				case "rehearse":
+					turn = rehearse(player, sets);
+					break;
+				case "upgrade":
+					upgrade(office, player, scan);
+					break;
+				default:
+					System.out.println("Unrecognized input.");
             }
         }
         System.out.printf("%s's turn ended.%n%n",player.getName());
