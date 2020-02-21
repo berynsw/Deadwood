@@ -9,10 +9,9 @@ public class Room {
 
 
 
-    public Room(String name, List<String> adj, boolean set) {
+    public Room(String name, List<String> adj) {
         this.name = name;
         this.adjacents = adj;
-        this.isSet = set;
     }
 
     public Room() {

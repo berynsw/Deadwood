@@ -18,7 +18,7 @@ import java.util.Stack;
 public class ParseXML{
         // building a document from the XML file
         // returns a Document object after loading the book.xml file.
-        public static Document getDocFromFile(String filename) throws ParserConfigurationException{
+        public Document getDocFromFile(String filename) throws ParserConfigurationException{
            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
            DocumentBuilder db = dbf.newDocumentBuilder();
            Document doc = null;
@@ -34,7 +34,7 @@ public class ParseXML{
         }
 
         // returns office
-        public static Room readOfficeData(Document d) {
+        public Office readOfficeData(Document d) {
             Element root = d.getDocumentElement();
             //each room
             NodeList roomNodes = root.getChildNodes();
@@ -59,11 +59,11 @@ public class ParseXML{
                     }
                 }
             }
-            return new Room("office", neighbors, false);
+            return new Office("office", neighbors);
         }
 
     // returns office
-    public static Room readTrailerData(Document d) {
+    public Room readTrailerData(Document d) {
         Element root = d.getDocumentElement();
         //each room
         NodeList roomNodes = root.getChildNodes();
@@ -88,11 +88,11 @@ public class ParseXML{
                 }
             }
         }
-        return new Room("trailer", neighbors, false);
+        return new Room("trailer", neighbors);
     }
 
         // populates set data
-        public static HashMap<String, Set> readSetData(Document d){
+        public HashMap<String, Set> readSetData(Document d){
             HashMap<String, Set> sets = new HashMap<>();
             Element root = d.getDocumentElement();
             //each room
@@ -131,7 +131,7 @@ public class ParseXML{
                         }
                     }
                     //add a new room
-                    sets.put(setName, new Set(setName, shots, roles, neighbors, true));
+                    sets.put(setName, new Set(setName, shots, roles, neighbors));
                 }
             }
             return sets;
