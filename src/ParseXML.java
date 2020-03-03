@@ -106,10 +106,29 @@ public class ParseXML{
                     //name
                     String setName = room.getAttributes().getNamedItem("name").getNodeValue().toLowerCase();
                     List<Role> roles = new ArrayList<>();
+                    List<Shot> shotList = new ArrayList<>();
+
                     int shots = 0;
+                    int x = 0;
+                    int y = 0;
+                    int h = 0;
+                    int w = 0;
                     NodeList setChild = room.getChildNodes();
                     for (int j=0; j< setChild.getLength(); j++){
                         Node sub = setChild.item(j);
+
+                        if ("area".equals(sub.getNodeName())) {
+                            String xS = room.getAttributes().getNamedItem("x").getNodeValue().toLowerCase();
+                            String yS = room.getAttributes().getNamedItem("y").getNodeValue().toLowerCase();
+                            String hS = room.getAttributes().getNamedItem("h").getNodeValue().toLowerCase();
+                            String wS = room.getAttributes().getNamedItem("w").getNodeValue().toLowerCase();
+
+                            x = Integer.parseInt(xS);
+                            y = Integer.parseInt(yS);
+                            h = Integer.parseInt(hS);
+                            w = Integer.parseInt(wS);
+                        }
+
                         NodeList subsub = sub.getChildNodes();
                         for (int k=0; k< subsub.getLength(); k++){
                             Node n = subsub.item(k);
@@ -122,16 +141,34 @@ public class ParseXML{
                             if("part".equals(n.getNodeName())){
                                 String s = n.getAttributes().getNamedItem("name").getNodeValue().toLowerCase();
                                 int rank = Integer.parseInt(n.getAttributes().getNamedItem("level").getNodeValue());
-                                roles.add(new Role(s, rank, false));
+
+                                // get coordinates of cards on board
+                                Node area = n.getFirstChild();
+                                String xS = area.getAttributes().getNamedItem("x").getNodeValue();
+                                String yS = area.getAttributes().getNamedItem("y").getNodeValue();
+
+                                int xVal = Integer.parseInt(xS);
+                                int yVal = Integer.parseInt(yS);
+                                roles.add(new Role(s, rank, false, xVal, yVal));
                             }
                             //takes
                             if("take".equals(n.getNodeName())){
                                 shots++;
+                                // get coordinates of shot counters
+                                Node inner = n.getFirstChild();
+                                String xS = inner.getAttributes().getNamedItem("x").getNodeValue().toLowerCase();
+                                String yS = inner.getAttributes().getNamedItem("y").getNodeValue().toLowerCase();
+
+                                int xVal = Integer.parseInt(xS);
+                                int yVal = Integer.parseInt(yS);
+
+                                Shot shot = new Shot(xVal, yVal);
+                                shotList.add(shot);
                             }
                         }
                     }
                     //add a new room
-                    sets.put(setName, new Set(setName, shots, roles, neighbors));
+                    sets.put(setName, new Set(setName, shots, roles, neighbors, x, y, h, w, shotList));
                 }
             }
             return sets;
@@ -149,6 +186,7 @@ public class ParseXML{
 
                 Node card = cards.item(i);
                 String cardName = card.getAttributes().getNamedItem("name").getNodeValue();
+                String png = card.getAttributes().getNamedItem("img").getNodeValue();
                 String b = card.getAttributes().getNamedItem("budget").getNodeValue();
                 int budget = Integer.parseInt(b);
 
@@ -165,8 +203,16 @@ public class ParseXML{
                         String roleName = sub.getAttributes().getNamedItem("name").getNodeValue();
                         String l = sub.getAttributes().getNamedItem("level").getNodeValue();
                         int rank = Integer.parseInt(l);
+                        // get coordinates of roles on card
+                        Node area = sub.getFirstChild();
 
-                        Role r = new Role(roleName, rank, true);
+                        String xS = area.getAttributes().getNamedItem("x").getNodeValue();
+                        String yS = area.getAttributes().getNamedItem("y").getNodeValue();
+
+                        int xVal = Integer.parseInt(xS);
+                        int yVal = Integer.parseInt(yS);
+
+                        Role r = new Role(roleName, rank, true, xVal, yVal);
                         roles.add(r);
 
                     } else if ("scene".equals(sub.getNodeName())) {
@@ -174,9 +220,9 @@ public class ParseXML{
                         int sceneNumber = Integer.parseInt(scene);
                     }
                 }
-                Card c = new Card(cardName, roles, budget);
+                Card c = new Card(cardName, roles, budget, png);
                 deck.add(c);
             }
         }
 
-}//class
+}
