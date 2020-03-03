@@ -4,12 +4,14 @@ public class Card {
     int budget;
     List<Role> roles = new ArrayList<>();
     String name;
+    String png;
 
 
-    public Card(String name, List<Role> list, int budget){
+    public Card(String name, List<Role> list, int budget, String png){
         this.budget = budget;
         this.roles = list;
         this.name = name;
+        this.png = png;
     }
 
     public int getBudget() {

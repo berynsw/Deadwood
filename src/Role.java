@@ -3,12 +3,24 @@ public class Role {
     int rank;
     boolean filled;
     boolean onCard;
+    int x;
+    int y;
 
-    public Role(String name, int rank, boolean onCard){
+    public Role(String name, int rank, boolean onCard, int x, int y){
         this.name = name;
         this.rank = rank;
         this.onCard = onCard;
         this.filled = false;
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 
     public String getName() {

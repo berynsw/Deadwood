@@ -1,17 +1,48 @@
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Set extends Room{
+    List<Role> roles = new ArrayList<>();
+    List<Shot> shotList = new ArrayList<>();
+
     int maxShots;
     int currentShots;
-    List<Role> roles = new ArrayList<>();
     Card card;
+    int x;
+    int y;
+    int h;
+    int w;
 
-    public Set(String name, int shots, List<Role> roles, List<String> adjacents){
+    public Set(String name, int shots, List<Role> roles, List<String> adjacents, int x, int y, int h, int w, List<Shot> shotList){
         this.name = name;
         this.maxShots = shots;
         this.currentShots = maxShots;
+        this.shotList = shotList;
         this.roles = roles;
         this.adjacents = adjacents;
+        this.x = x;
+        this.y = y;
+        this.h = h;
+        this.w = w;
+    }
+
+    public List<Shot> getShotList() {
+        return shotList;
+    }
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getH() {
+        return h;
+    }
+
+    public int getW() {
+        return w;
     }
 
     public int getMaxShots() {
@@ -45,4 +76,5 @@ public class Set extends Room{
     public void setCard(Card card) {
         this.card = card;
     }
+
 }
