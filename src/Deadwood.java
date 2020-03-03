@@ -6,6 +6,8 @@ public class Deadwood {
     private static Deadwood deadwood = new Deadwood();
     private int cardsOnBoard = 10;
     private int days = 4;
+    List<Player> players = new ArrayList<>();
+    static View view;
 
     public static Deadwood getInstance(){
         return deadwood;
@@ -24,7 +26,7 @@ public class Deadwood {
     public static void main(String[] args){
 
         //initialize board structures
-        List<Player> players = new ArrayList<>();
+
         HashMap<String,Set> sets = new HashMap<>();
         Stack<Card> deck = new Stack<>();
         Room trailer = null;
@@ -49,14 +51,14 @@ public class Deadwood {
             System.out.println("Error = "+e);
         }
 
+        view = View.getInstance();
 
-        addPlayers(args, players);
 
         while(deadwood.days > 0){
-            initDay(players, sets, deck);
+            initDay(deadwood.players, sets, deck);
             while(deadwood.cardsOnBoard > 1){
-                for (int i = 0; i < players.size(); i++) {
-                    takeTurn(players.get(i), players, sets, trailer, office);
+                for (int i = 0; i < deadwood.players.size(); i++) {
+                    takeTurn(deadwood.players.get(i), deadwood.players, sets, trailer, office);
                     if (deadwood.cardsOnBoard == 1) {            //checks if day is over during player rotation
                         break;
                     }
@@ -64,16 +66,16 @@ public class Deadwood {
             }
             deadwood.days--;
         }
-        displayTotalScores(players);
+        displayTotalScores(deadwood.players);
     }
 
     // Adds players to the game
     //  Updates credits, rank, or number of days based on number of players.
-    public static void addPlayers(String[] arg, List<Player> players) {
+    public static void addPlayers(String input) {
         //get number of players from args
         int playerCount = 0;
         try{
-            playerCount = Integer.parseInt(arg[0]);
+            playerCount = Integer.parseInt(input);
         }
         catch(Exception e){
             System.out.println("Must provide one arg, an integer number of players.");
@@ -89,17 +91,16 @@ public class Deadwood {
 
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
-            System.out.printf("Enter player %d's name: \n", i + 1);
-            String name = scan.next();
-            players.add(new Player(name));
+
+            deadwood.players.add(new Player("dummy", view.getPlayerDice()[i]));
             if (playerCount <= 3) {
                 deadwood.days = 3;
             } else if (playerCount == 5) {
-                players.get(i).setCredits(2);
+                deadwood.players.get(i).setCredits(2);
             } else if (playerCount == 6) {
-                players.get(i).setCredits(4);
+                deadwood.players.get(i).setCredits(4);
             } else if (playerCount >= 7) {
-                players.get(i).setRank(2);
+                deadwood.players.get(i).setRank(2);
             }
         }
         System.out.println();
