@@ -6,7 +6,7 @@
    Classes Used: JFrame, JLabel, JButton, JLayeredPane
 
 */
-
+import java.util.*;
 import java.awt.Color;
 import javax.swing.*;
 import javax.swing.ImageIcon;
@@ -26,10 +26,10 @@ public class Board extends JFrame {
     JButton bMove;
     // JLayered Pane
     JLayeredPane bPane;
-    String[] playerDice = {"b1.png", "c1.png", "g1.png", "o1.png", "p1.png", "r1.png", "v1.png", "w1.png", "y1.png"};
+    ArrayList<String> playerDice = new ArrayList<>(Arrays.asList("b1.png", "c1.png", "g1.png", "o1.png", "p1.png", "r1.png", "v1.png", "w1.png", "y1.png"));
 
     // Constructor
-    public String[] getPlayerDice() {
+    public ArrayList<String> getPlayerDice() {
         return playerDice;
     }
 

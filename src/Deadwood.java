@@ -4,6 +4,7 @@ import org.w3c.dom.Document;
 import java.awt.Color;
 import javax.swing.*;
 import javax.swing.ImageIcon;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class Deadwood {
 
@@ -13,8 +14,10 @@ public class Deadwood {
     private List<Player> players = new ArrayList<>();
     private HashMap<String,Set> sets = new HashMap<>();
     private Stack<Card> deck = new Stack<>();
+
     private Room trailer = null;
     private Office office = null;
+    public static Board board;
 
     private static Deadwood deadwood = new Deadwood();
     public static Deadwood getInstance(){
@@ -33,12 +36,12 @@ public class Deadwood {
     public Room getTrailer() { return trailer; }
     public Office getOffice() { return office; }
 
-    public static Board board;
 
 
 
 
-    public static void main(String[] args){
+
+    public static void main(String[] args) throws ParserConfigurationException {
         //populate rooms and cards from xml
         Document doc1;
         Document doc2;
@@ -59,8 +62,12 @@ public class Deadwood {
         }
 
 
-        Board board = new Board();
+        board = new Board();
         board.setVisible(true);
+
+
+
+
         int num = board.getPlayerNum();
         addPlayers(num);
 
@@ -115,8 +122,8 @@ public class Deadwood {
 
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
-
-            deadwood.players.add(new Player("dummy", board.getPlayerDice()[i]));
+            System.out.println(board.getPlayerDice().get(i));
+            deadwood.players.add(new Player("dummy", board.getPlayerDice().get(i)));
             if (playerCount <= 3) {
                 deadwood.days = 3;
             } else if (playerCount == 5) {

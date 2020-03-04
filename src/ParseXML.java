@@ -117,11 +117,12 @@ public class ParseXML{
                     for (int j=0; j< setChild.getLength(); j++){
                         Node sub = setChild.item(j);
 
+
                         if ("area".equals(sub.getNodeName())) {
-                            String xS = room.getAttributes().getNamedItem("x").getNodeValue();
-                            String yS = room.getAttributes().getNamedItem("y").getNodeValue();
-                            String hS = room.getAttributes().getNamedItem("h").getNodeValue();
-                            String wS = room.getAttributes().getNamedItem("w").getNodeValue();
+                            String xS = sub.getAttributes().getNamedItem("x").getNodeValue();
+                            String yS = sub.getAttributes().getNamedItem("y").getNodeValue();
+                            String hS = sub.getAttributes().getNamedItem("h").getNodeValue();
+                            String wS = sub.getAttributes().getNamedItem("w").getNodeValue();
                             x = Integer.parseInt(xS);
                             y = Integer.parseInt(yS);
                             h = Integer.parseInt(hS);
@@ -142,9 +143,12 @@ public class ParseXML{
                                 int rank = Integer.parseInt(n.getAttributes().getNamedItem("level").getNodeValue());
 
                                 // get coordinates of cards on board
-                                Node area = n.getFirstChild();
-                                String xS = area.getAttributes().getNamedItem("x").getNodeValue();
-                                String yS = area.getAttributes().getNamedItem("y").getNodeValue();
+                                Element e = (Element)n;
+                                NodeList areas = e.getElementsByTagName("area");
+                                Element area = (Element)areas.item(0);
+
+                                String xS = area.getAttribute("x");
+                                String yS = area.getAttribute("y");
                                 int xVal = Integer.parseInt(xS);
                                 int yVal = Integer.parseInt(yS);
                                 roles.add(new Role(s, rank, false, xVal, yVal));
@@ -152,12 +156,18 @@ public class ParseXML{
                             //takes
                             if("take".equals(n.getNodeName())){
                                 shots++;
+
                                 // get coordinates of shot counters
-                                Node inner = n.getFirstChild();
-                                String xS = inner.getAttributes().getNamedItem("x").getNodeValue();
-                                String yS = inner.getAttributes().getNamedItem("y").getNodeValue();
+
+                                Element e = (Element)n;
+                                NodeList areas = e.getElementsByTagName("area");
+                                Element area = (Element)areas.item(0);
+
+                                String xS = area.getAttribute("x");
+                                String yS = area.getAttribute("y");
                                 int xVal = Integer.parseInt(xS);
                                 int yVal = Integer.parseInt(yS);
+
                                 Shot shot = new Shot(xVal, yVal);
                                 shotList.add(shot);
                             }
@@ -199,12 +209,13 @@ public class ParseXML{
                         String roleName = sub.getAttributes().getNamedItem("name").getNodeValue();
                         String l = sub.getAttributes().getNamedItem("level").getNodeValue();
                         int rank = Integer.parseInt(l);
+
                         // get coordinates of roles on card
-                        Node area = sub.getFirstChild();
-
-                        String xS = area.getAttributes().getNamedItem("x").getNodeValue();
-                        String yS = area.getAttributes().getNamedItem("y").getNodeValue();
-
+                        Element e = (Element)sub;
+                        NodeList areas = e.getElementsByTagName("area");
+                        Element area = (Element)areas.item(0);
+                        String xS = area.getAttribute("x");
+                        String yS = area.getAttribute("y");
                         int xVal = Integer.parseInt(xS);
                         int yVal = Integer.parseInt(yS);
 
