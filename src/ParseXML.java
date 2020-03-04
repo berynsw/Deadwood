@@ -118,11 +118,10 @@ public class ParseXML{
                         Node sub = setChild.item(j);
 
                         if ("area".equals(sub.getNodeName())) {
-                            String xS = room.getAttributes().getNamedItem("x").getNodeValue().toLowerCase();
-                            String yS = room.getAttributes().getNamedItem("y").getNodeValue().toLowerCase();
-                            String hS = room.getAttributes().getNamedItem("h").getNodeValue().toLowerCase();
-                            String wS = room.getAttributes().getNamedItem("w").getNodeValue().toLowerCase();
-
+                            String xS = room.getAttributes().getNamedItem("x").getNodeValue();
+                            String yS = room.getAttributes().getNamedItem("y").getNodeValue();
+                            String hS = room.getAttributes().getNamedItem("h").getNodeValue();
+                            String wS = room.getAttributes().getNamedItem("w").getNodeValue();
                             x = Integer.parseInt(xS);
                             y = Integer.parseInt(yS);
                             h = Integer.parseInt(hS);
@@ -146,7 +145,6 @@ public class ParseXML{
                                 Node area = n.getFirstChild();
                                 String xS = area.getAttributes().getNamedItem("x").getNodeValue();
                                 String yS = area.getAttributes().getNamedItem("y").getNodeValue();
-
                                 int xVal = Integer.parseInt(xS);
                                 int yVal = Integer.parseInt(yS);
                                 roles.add(new Role(s, rank, false, xVal, yVal));
@@ -156,12 +154,10 @@ public class ParseXML{
                                 shots++;
                                 // get coordinates of shot counters
                                 Node inner = n.getFirstChild();
-                                String xS = inner.getAttributes().getNamedItem("x").getNodeValue().toLowerCase();
-                                String yS = inner.getAttributes().getNamedItem("y").getNodeValue().toLowerCase();
-
+                                String xS = inner.getAttributes().getNamedItem("x").getNodeValue();
+                                String yS = inner.getAttributes().getNamedItem("y").getNodeValue();
                                 int xVal = Integer.parseInt(xS);
                                 int yVal = Integer.parseInt(yS);
-
                                 Shot shot = new Shot(xVal, yVal);
                                 shotList.add(shot);
                             }
