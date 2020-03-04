@@ -8,12 +8,27 @@ public class Player {
     private int rehearsalTokens;
     private String room;
     private Role role;
+    private String icon;
+    private boolean onCard;
+
+    public boolean isOnCard() {
+        return onCard;
+    }
+
+    public void setOnCard(boolean onCard) {
+        this.onCard = onCard;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
 
     //constructor
-    public Player(String name) {
+    public Player(String name, String icon) {
         this.name = name;
         this.rank = 1;
         this.rehearsalTokens = 0;
+        this.icon = icon;
     }
 
     public String getName() {
@@ -72,78 +87,84 @@ public class Player {
         this.role = role;
     }
 
-    public void act(Player player, Set set, List<Player> players) {
+    // Attempts to act in player's current role
+    public static boolean act(Player player, Set set, List<Player> players) {
         Deadwood deadwood = Deadwood.getInstance();
-        String LINE = "--------------------------------------------------------";
+        if (player.getRole()!= null) {
 
-        System.out.println(LINE);
-        Random r = new Random();
-        int roll = r.nextInt(6) + 1;
-        int budget = set.getCard().getBudget();
+            Random r = new Random();
+            int roll = r.nextInt(6) + 1;
+            int budget = set.getCard().getBudget();
 
-        System.out.printf("You need to roll a %d...\n", budget);
-        System.out.printf("You rolled a %d and you have %d rehearsal chips!\n", roll, player.getRehearsalTokens());
+            System.out.printf("You need to roll a %d...\n", budget);
+            System.out.printf("You rolled a %d and you have %d rehearsal chips!\n", roll, player.getRehearsalTokens());
 
-        //if you fail acting
-        if (budget > roll + player.getRehearsalTokens()) {
-            System.out.println("Apparently, you're not as good an actor as you think.");
+            //if you fail acting
+            if (budget > roll + player.getRehearsalTokens()) {
+                System.out.println("Apparently, you're not as good an actor as you think.");
 
-            //if failed off-card, still get a dollar
-            if (!player.getRole().isOnCard()) {
-                player.setDollars(player.getDollars() + 1);
-                System.out.println("As compensation, you get 1 dollar.");
-            } else {
-                System.out.println("As compensation, you get nothing. Better luck next time!");
-            }
-        }
-        //if you succeed acting
-        else {
-            System.out.println("It appears you're not as bad an actor as you look.");
-
-            if (player.getRole().isOnCard()) {
-                player.setCredits(player.getCredits() + 2);
-                System.out.println("As compensation, you get 2 credits.");
-            } else {
-                player.setCredits(player.getCredits() + 1);
-                player.setDollars(player.getDollars() + 1);
-                System.out.println("As compensations, you get 1 dollar and 1 credit.");
-            }
-            //decrement shot counter
-            if (set.currentShots > 1) {
-                set.setCurrentShots(set.currentShots - 1);
-                if (set.getCurrentShots() > 1) {
-                    System.out.println("You remove one shot counter. There are " + set.getCurrentShots() + " shots left.");
+                //if failed off-card, still get a dollar
+                if (!player.getRole().isOnCard()) {
+                    player.setDollars(player.getDollars() + 1);
+                    System.out.println("As compensation, you get 1 dollar.");
                 } else {
-                    System.out.println("You remove one shot counter. There is 1 shot left.");
+                    System.out.println("As compensation, you get nothing. Better luck next time!");
                 }
-            } else {
-                System.out.println(LINE);
-                System.out.println("That about wraps it up, the scene is over!");
-                set.setCurrentShots(0);
-                deadwood.payOut(players, set);
-                //player is no longer in a role
-                List<Player> playersOnSet = new ArrayList<>();
-                for (int j = 0; j < players.size(); j++) {
-                    if (set.getName().equals(players.get(j).getRoom())) {
-                        playersOnSet.add(players.get(j));
-                    }
-                }
-                for (Player endPlayerRole : playersOnSet) {
-                    endPlayerRole.setRole(null);
-                    endPlayerRole.setRehearsalTokens(0);
-                }
-                set.setCard(null);
-                deadwood.setCardsOnBoard(deadwood.getCardsOnBoard()-1);
             }
+            //if you succeed acting
+            else {
+                System.out.println("It appears you're not as bad an actor as you look.");
+
+                if (player.getRole().isOnCard()) {
+                    player.setCredits(player.getCredits() + 2);
+                    System.out.println("As compensation, you get 2 credits.");
+                } else {
+                    player.setCredits(player.getCredits() + 1);
+                    player.setDollars(player.getDollars() + 1);
+                    System.out.println("As compensations, you get 1 dollar and 1 credit.");
+                }
+                //decrement shot counter
+                if (set.currentShots > 1) {
+                    set.setCurrentShots(set.currentShots - 1);
+                    if (set.getCurrentShots() > 1) {
+                        System.out.println("You remove one shot counter. There are " + set.getCurrentShots() + " shots left.");
+                    } else {
+                        System.out.println("You remove one shot counter. There is 1 shot left.");
+                    }
+                } else {
+
+                    System.out.println("That about wraps it up, the scene is over!");
+                    set.setCurrentShots(0);
+                    deadwood.payOut(players, set);
+                    //player is no longer in a role
+                    List<Player> playersOnSet = new ArrayList<>();
+                    for (int j = 0; j < players.size(); j++) {
+                        if (set.getName().equals(players.get(j).getRoom())) {
+                            playersOnSet.add(players.get(j));
+                        }
+                    }
+                    for (Player endPlayerRole : playersOnSet) {
+                        endPlayerRole.setRole(null);
+                        endPlayerRole.setRehearsalTokens(0);
+                    }
+                    set.setCard(null);
+                    deadwood.setCardsOnBoard(deadwood.getCardsOnBoard() - 1);
+                }
+            }
+
+            return false;
+        } else {
+            System.out.println("You are not currently acting in a role.");
         }
-        System.out.println(LINE);
+        return true;
     }
+
 
     // Display neighboring room, calls work() and upgrade() if appropriate
     public static boolean move(Player player, HashMap<String, Set> sets, Room trailer, Office office, Scanner scan){
         Deadwood deadwood = Deadwood.getInstance();
         if(player.getRole() != null){
-            System.out.println("You are acting in a role and can't move. Options are act, rehearse, or end.");
+            System.out.println("You are acting in a role and can't move. So, your only options are act, rehearse, or end.");
         }
         else{
             System.out.println("The neighboring rooms to your current room are:");
@@ -179,38 +200,42 @@ public class Player {
     // Wrapper function for obtaining a new role
     public static boolean work(Player player, Set set, Scanner scan){
         Deadwood deadwood = Deadwood.getInstance();
-
-        if(player.getRole() != null){
-            System.out.println("You're already working. Options are act, rehearse, or end.");
+        if(!deadwood.getSets().containsKey(player.getRoom())){
+            System.out.println("You're not in a set. You must move to a set to work.");
         }
         else{
-            //if the set is active
-            if(set.getCard() != null){
-                List<Role> offCard = set.getRoles();
-                List<Role> onCard = set.getCard().getRoles();
-                deadwood.displayRoles(offCard, onCard);
-                System.out.println("If you would like to work on one of these roles type the role 'name', otherwise your turn will end.");
-                String input = scan.nextLine().toLowerCase();
-                takeRole(player, offCard, input);
-                takeRole(player, onCard, input);
-                return false;
+            if(player.getRole() != null){
+                System.out.println("You're already working. Options are act, rehearse, or end.");
             }
             else{
-                System.out.println("This set is wrapped. You can't work here today.");
+                //if the set is active
+                if(set.getCard() != null){
+                    List<Role> offCard = set.getRoles();
+                    List<Role> onCard = set.getCard().getRoles();
+                    //deadwood.displayRoles(offCard, onCard);
+                    System.out.println("If you would like to work on one of these roles type the role 'name'.");
+                    String input = scan.nextLine().toLowerCase();
+                    return takeRole(player, onCard, offCard, input);
+                }
+                else{
+                    System.out.println("This set is wrapped. You can't work here today.");
+                }
             }
         }
         return true;
     }
 
     // Searches through list of roles for specified role name (on or off card) and allows player to take that role if possible
-    public static void takeRole(Player player, List<Role> roles, String input){
-        for(Role role : roles){
+    public static boolean takeRole(Player player, List<Role> onCard, List<Role> offCard, String input){
+        for(Role role : onCard){
             if(input.equalsIgnoreCase(role.getName())){
                 if(player.getRank() >= role.getRank()){
                     if(!role.isFilled()){
                         player.setRole(role);
+                        player.setOnCard(true);
                         role.setFilled(true);
-                        System.out.printf("You took %s!%n", role.getName());
+                        System.out.printf("You took the on card role %s!%n", role.getName());
+                        return false;
                     }
                     else{
                         System.out.printf("That role is already filled.%n");
@@ -221,8 +246,29 @@ public class Player {
                 }
             }
         }
+        for(Role role : offCard){
+            if(input.equalsIgnoreCase(role.getName())){
+                if(player.getRank() >= role.getRank()){
+                    if(!role.isFilled()){
+                        player.setRole(role);
+                        player.setOnCard(false);
+                        role.setFilled(true);
+                        System.out.printf("You took the off card role %s!%n", role.getName());
+                        return false;
+                    }
+                    else{
+                        System.out.printf("That role is already filled.%n");
+                    }
+                }
+                else{
+                    System.out.println("You're not high enough rank");
+                }
+            }
+        }
+        return true;
     }
 
+    // Adds 1 to player's practice tokens if applicable
     public static boolean rehearse(Player player, HashMap<String, Set> sets){
         if(player.getRole() != null){
             int budget = sets.get(player.getRoom()).getCard().getBudget();

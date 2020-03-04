@@ -1,37 +1,44 @@
 import java.util.*;
 import org.w3c.dom.Document;
 
+import java.awt.Color;
+import javax.swing.*;
+import javax.swing.ImageIcon;
+
 public class Deadwood {
 
-    private static Deadwood deadwood = new Deadwood();
+
     private int cardsOnBoard = 10;
     private int days = 4;
-    List<Player> players = new ArrayList<>();
-    static View view;
+    private List<Player> players = new ArrayList<>();
+    private HashMap<String,Set> sets = new HashMap<>();
+    private Stack<Card> deck = new Stack<>();
+    private Room trailer = null;
+    private Office office = null;
 
+    private static Deadwood deadwood = new Deadwood();
     public static Deadwood getInstance(){
         return deadwood;
     }
-    private Deadwood() {
-    }
-
+    private Deadwood() {}
     public int getCardsOnBoard() {
         return this.cardsOnBoard;
     }
-
     public void setCardsOnBoard(int cardsOnBoard) {
         this.cardsOnBoard = cardsOnBoard;
     }
+    public List<Player> getPlayers() { return players; }
+    public HashMap<String, Set> getSets() { return sets; }
+    public Stack<Card> getDeck() { return deck; }
+    public Room getTrailer() { return trailer; }
+    public Office getOffice() { return office; }
+
+    public static Board board;
+
+
+
 
     public static void main(String[] args){
-
-        //initialize board structures
-
-        HashMap<String,Set> sets = new HashMap<>();
-        Stack<Card> deck = new Stack<>();
-        Room trailer = null;
-        Office office = null;
-
         //populate rooms and cards from xml
         Document doc1;
         Document doc2;
@@ -39,26 +46,29 @@ public class Deadwood {
         try{
             //parse rooms
             doc1 = parsing.getDocFromFile("board.xml");
-            sets = parsing.readSetData(doc1);
-            trailer = parsing.readTrailerData(doc1);
-            office = parsing.readOfficeData(doc1);
+            deadwood.sets = parsing.readSetData(doc1);
+            deadwood.trailer = parsing.readTrailerData(doc1);
+            deadwood.office = parsing.readOfficeData(doc1);
 
             //parse cards
             doc2 = parsing.getDocFromFile("cards.xml");
-            parsing.readCardData(doc2, deck);
+            parsing.readCardData(doc2, deadwood.deck);
         }
         catch(Exception e){
             System.out.println("Error = "+e);
         }
 
-        view = View.getInstance();
 
+        Board board = new Board();
+        board.setVisible(true);
+        int num = board.getPlayerNum();
+        addPlayers(num);
 
         while(deadwood.days > 0){
-            initDay(deadwood.players, sets, deck);
+            initDay(deadwood.players, deadwood.sets, deadwood.deck);
             while(deadwood.cardsOnBoard > 1){
                 for (int i = 0; i < deadwood.players.size(); i++) {
-                    takeTurn(deadwood.players.get(i), deadwood.players, sets, trailer, office);
+                    takeTurn(deadwood.players.get(i), deadwood.players, deadwood.sets, deadwood.trailer, deadwood.office);
                     if (deadwood.cardsOnBoard == 1) {            //checks if day is over during player rotation
                         break;
                     }
@@ -66,20 +76,34 @@ public class Deadwood {
             }
             deadwood.days--;
         }
-        displayTotalScores(deadwood.players);
+        //displayTotalScores(deadwood.players);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Adds players to the game
     //  Updates credits, rank, or number of days based on number of players.
-    public static void addPlayers(String input) {
+    public static void addPlayers(int input) {
+        System.out.println(input);
         //get number of players from args
-        int playerCount = 0;
-        try{
-            playerCount = Integer.parseInt(input);
-        }
-        catch(Exception e){
-            System.out.println("Must provide one arg, an integer number of players.");
-        }
+        int playerCount = input;
+
 
         //check valid number of players
         if (playerCount < 2 || playerCount > 8) {
@@ -92,7 +116,7 @@ public class Deadwood {
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
 
-            deadwood.players.add(new Player("dummy", view.getPlayerDice()[i]));
+            deadwood.players.add(new Player("dummy", board.getPlayerDice()[i]));
             if (playerCount <= 3) {
                 deadwood.days = 3;
             } else if (playerCount == 5) {
@@ -121,107 +145,43 @@ public class Deadwood {
         deadwood.cardsOnBoard = 10;
     }
 
-    // Script for an individual player's turn
+    // Calls corresponding player action
     public static void takeTurn(Player player, List<Player> players, HashMap<String, Set> sets, Room trailer, Office office) {
         System.out.printf("%s it's your turn to play.%n", player.getName());
         Scanner scan = new Scanner(System.in);
-        boolean turn = true; // takeRole(), act(), rehearse() could return booleans to update this
+        boolean turn = true;
         String input;
 
         while(turn){
             System.out.printf("The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'.%n");
             input = scan.nextLine().toLowerCase();
-            
             switch(input){
-				case "end":
-					turn = false;
-					break;
-				case "active player":
-					displayCurrentStats(player);
-					break;
-				case "all players":
-					for(Player p : players){
-						if(p == player){
-							System.out.println("Active player: ");
-						}
-						displayCurrentStats(p);
-						System.out.println();
-					}
-					break;
-				case "act":
-					if (player.getRole()!= null) {
-						player.act(player, sets.get(player.getRoom()), players);
-						turn = false;
-					} else {
-						System.out.println("You are not currently acting in a role.");
-					}
-					break;
-				case "move":
-					turn = player.move(player, sets, trailer, office, scan);
-					break;
-				case "work":
-					if(!sets.containsKey(player.getRoom())){
-                    	System.out.println("You're not in a set. You must move to a set to work.");
-					}
-					else{
-						turn = player.work(player, sets.get(player.getRoom()), scan);
-					}
-					break;
-				case "rehearse":
-					turn = player.rehearse(player, sets);
-					break;
-				case "upgrade":
-					upgrade(office, player, scan);
-					break;
-				default:
-					System.out.println("Unrecognized input.");
+                case "end":
+                    turn = false;
+                    break;
+                case "act":
+                    turn = player.act(player, sets.get(player.getRoom()), players);
+                    break;
+                case "move":
+                    turn = player.move(player, sets, trailer, office, scan);
+                    break;
+                case "work":
+                    turn = player.work(player, sets.get(player.getRoom()), scan);
+                    break;
+                case "rehearse":
+                    turn = player.rehearse(player, sets);
+                    break;
+                case "upgrade":
+                    upgrade(office, player, scan);
+                    break;
+                default:
+                    System.out.println("Unrecognized input.");
             }
         }
         System.out.printf("%s's turn ended.%n%n",player.getName());
     }
 
-    // Displays available roles (on and off card) in current room
-    public static void displayRoles(List<Role> offCard, List<Role> onCard){
-        System.out.println("Here are the roles available:");
-        System.out.printf(" Off card: %n");
-        for(Role role : offCard){
-            if(!role.isFilled()){
-                System.out.printf("  name: %s, rank required: %d%n", role.getName(), role.getRank());
-            }
-        }
-        System.out.printf(" On card: %n");
-        for(Role role : onCard){
-            if(!role.isFilled()){
-                System.out.printf("  name: %s, rank required: %d%n", role.getName(), role.getRank());
-            }
-        }
-    }
 
-    // Display a players stats
-    public static void displayCurrentStats(Player player) {
-        System.out.printf("name: %s%n", player.getName());
-        System.out.printf("room: %s%n", player.getRoom());
-        System.out.printf("rank: %d%n", player.getRank());
-        System.out.printf("credits: %d%n", player.getCredits());
-        System.out.printf("dollars: %s%n", player.getDollars());
-    }
-
-    // Display final scores
-    public static void displayTotalScores(List<Player> players){
-        String LINE = "--------------------------------------------------------";
-        for(Player player : players) {
-            System.out.printf("%s's total score: %d\n!",player.getName(), totalScore(player));
-        }
-        System.out.println(LINE);
-    }
-
-    // Calculate final scores
-    public static int totalScore (Player player) {
-        int dollars = player.getDollars();
-        int credits = player.getCredits();
-        int rank = player.getRank()*5;
-        return dollars + credits + rank;
-    }
 
     // Returns the list of rooms adjacent to the current location
     //  cases for if the current room is trailer office or set
@@ -310,26 +270,21 @@ public class Deadwood {
         List<Player> playersOnCard = new ArrayList<>();
         List<Player> playersOffCard = new ArrayList<>();
         List<Role> roles = set.getCard().getRoles();
-
         List<Integer> dice = new ArrayList<>();
         Random r = new Random();
-
         //generate list of dice rolls equivalent to the budget of the movie
         int budget = set.getCard().getBudget();
         for (int i = 0; i < budget; i++) {
             dice.add(r.nextInt(6) + 1);
         }
-
         //sort dice arrayList
         Collections.sort(dice);
-
         //add all players on set into arraylist
         for (int j = 0; j < p.size(); j++) {
             if (set.getName().equals(p.get(j).getRoom())) {
                 playersOnSet.add(p.get(j));
             }
         }
-
         //for all players on the set, add them to onCard or offCard arraylists
         for (Player player : playersOnSet) {
             if (player.getRole() != null) {
@@ -340,11 +295,9 @@ public class Deadwood {
                 }
             }
         }
-
         //initialize static set of onCard roles
         List<Role> onCardRoles = new ArrayList<>();
         onCardRoles.addAll(roles);
-
         //only payout players if there is at least 1 player working onCard
         if (playersOnCard.size() > 0) {
             //offCard players receive dollars equal to the rank of their role
@@ -354,7 +307,6 @@ public class Deadwood {
                 System.out.printf("%s receives %d dollars and now has %d dollars.\n",
                         player.getName(), player.getRole().getRank(), player.getDollars());
             }
-
             //Player highestRole = playersOnCard.get(0);
             while (!dice.isEmpty()) {
                 //reinitialize roles set if empty
