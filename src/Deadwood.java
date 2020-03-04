@@ -64,6 +64,7 @@ public class Deadwood {
 
         board = new Board();
         board.setVisible(true);
+        board.placeCardBacks(deadwood.sets);
 
 
 
@@ -123,7 +124,8 @@ public class Deadwood {
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
             System.out.println(board.getPlayerDice().get(i));
-            deadwood.players.add(new Player("dummy", board.getPlayerDice().get(i)));
+            String icon = "images/dice/"+board.getPlayerDice().get(i);
+            deadwood.players.add(new Player("dummy", icon));
             if (playerCount <= 3) {
                 deadwood.days = 3;
             } else if (playerCount == 5) {

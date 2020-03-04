@@ -16,17 +16,22 @@ import javax.swing.JOptionPane;
 public class Board extends JFrame {
 
     // JLabels
-    JLabel boardlabel;
-    JLabel cardlabel;
-    JLabel playerlabel;
-    JLabel mLabel;
+    static JLabel boardlabel;
+    static JLayeredPane bPane;
+
+
+    static JLabel playerlabel;
+    static JLabel mLabel;
+
+
     //JButtons
     JButton bAct;
     JButton bRehearse;
     JButton bMove;
     // JLayered Pane
-    JLayeredPane bPane;
+
     ArrayList<String> playerDice = new ArrayList<>(Arrays.asList("b1.png", "c1.png", "g1.png", "o1.png", "p1.png", "r1.png", "v1.png", "w1.png", "y1.png"));
+
 
     // Constructor
     public ArrayList<String> getPlayerDice() {
@@ -44,7 +49,7 @@ public class Board extends JFrame {
 
         // Create the deadwood board
         boardlabel = new JLabel();
-        ImageIcon icon =  new ImageIcon("board.jpg");
+        ImageIcon icon =  new ImageIcon("images/board.jpg");
         boardlabel.setIcon(icon);
         boardlabel.setBounds(0,0,icon.getIconWidth(),icon.getIconHeight());
 
@@ -54,23 +59,7 @@ public class Board extends JFrame {
         // Set the size of the GUI
         setSize(icon.getIconWidth()+200,icon.getIconHeight());
 
-        // Add a scene card to this room
-        cardlabel = new JLabel();
-        ImageIcon cIcon =  new ImageIcon("r2.png");
-        cardlabel.setIcon(cIcon);
-        cardlabel.setBounds(991,248,cIcon.getIconWidth(),cIcon.getIconHeight());
-        cardlabel.setOpaque(true);
 
-        bPane.add(cardlabel, new Integer(1));
-
-        cardlabel = new JLabel();
-        ImageIcon dIcon =  new ImageIcon("r2.png");
-        cardlabel.setIcon(cIcon);
-        cardlabel.setBounds(991 + (cIcon.getIconWidth() + 10),248,dIcon.getIconWidth(),dIcon.getIconHeight());
-        cardlabel.setOpaque(true);
-
-        // Add the card to the lower layer
-        bPane.add(cardlabel, new Integer(1));
 
         // Add a dice to represent a player.
         // Role for Crusty the prospector. The x and y co-ordiantes are taken from Board.xml file
@@ -138,19 +127,30 @@ public class Board extends JFrame {
 
 
     public static int getPlayerNum(){
-        String[] options = {"2", "3", "4", "5", "6", "7", "8"};
+        String[] options = {"2 players", "3 players", "4 players", "5 players", "6 players", "7 players", "8 players"};
         int[] nums = {2,3,4,5,6,7,8};
-
-        int option =  JOptionPane.showOptionDialog(null, "Choose a number of players", "Message",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, options, options[0]);
-        int g = 0;
-        while(g==0){
-            if(option != 0)
-                g++;
-        }
-
+        int option =  JOptionPane.showOptionDialog(null, "How many players?", "Message", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, options, options[0]);
         return nums[option];
     }
+
+    public static void placeCard(int x, int y, String file){
+        // Add a scene card to this room
+        JLabel cardlabel = new JLabel();
+        ImageIcon cIcon =  new ImageIcon(file);
+        cardlabel.setIcon(cIcon);
+        cardlabel.setBounds(x,y,205,115);
+        cardlabel.setOpaque(true);
+        // Add the card to the lower layer
+        bPane.add(cardlabel, new Integer(1));
+    }
+
+    public static void placeCardBacks(HashMap<String, Set> sets){
+        for(Set set : sets.values()){
+            placeCard(set.getX(), set.getY(), "images/CardBack.jpg");
+        }
+    }
+
+
 
 
 }
