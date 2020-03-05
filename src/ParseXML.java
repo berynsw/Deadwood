@@ -227,7 +227,8 @@ public class ParseXML{
                         int sceneNumber = Integer.parseInt(scene);
                     }
                 }
-                Card c = new Card(cardName, roles, budget, png);
+                String image = "images/cards/"+png;
+                Card c = new Card(cardName, roles, budget, image);
                 deck.add(c);
             }
         }
