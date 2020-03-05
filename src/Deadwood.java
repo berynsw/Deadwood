@@ -14,6 +14,15 @@ public class Deadwood {
     private List<Player> players = new ArrayList<>();
     private HashMap<String,Set> sets = new HashMap<>();
     private Stack<Card> deck = new Stack<>();
+    public static Player currentPlayer = null;
+
+    public static Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public static void setCurrentPlayer(Player currentPlayer) {
+        Deadwood.currentPlayer = currentPlayer;
+    }
 
     private Room trailer = null;
     private Office office = null;
@@ -67,10 +76,10 @@ public class Deadwood {
         board.placeCardBacks(deadwood.sets);
 
 
-
-
         int num = board.getPlayerNum();
         addPlayers(num);
+
+        board.trailerPlayers(deadwood.getPlayers());
 
         while(deadwood.days > 0){
             initDay(deadwood.players, deadwood.sets, deadwood.deck);

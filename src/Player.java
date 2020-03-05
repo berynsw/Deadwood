@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.util.*;
 
 public class Player {
@@ -10,6 +11,15 @@ public class Player {
     private Role role;
     private String icon;
     private boolean onCard;
+    private JLabel label;
+
+    public JLabel getLabel() {
+        return label;
+    }
+
+    public void setLabel(JLabel pos) {
+        this.label = pos;
+    }
 
     public boolean isOnCard() {
         return onCard;
