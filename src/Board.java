@@ -149,6 +149,51 @@ public class Board extends JFrame {
             placeCard(set.getX(), set.getY(), "images/CardBack.jpg");
         }
     }
+   
+    public static void placeShots(HashMap<String, Set> sets) {
+        for (Set set : sets.values()) {
+            for (Shot shot : set.getShotList()) {
+                // Add a scene card to this room
+                JLabel shotlabel = new JLabel();
+                ImageIcon cIcon = new ImageIcon("images/shot.png");
+                shotlabel.setIcon(cIcon);
+                shotlabel.setBounds(shot.getX(), shot.getY(), cIcon.getIconHeight(), cIcon.getIconWidth());
+                shotlabel.setOpaque(true);
+                // Add the card to the lower layer
+                bPane.add(shotlabel, new Integer(1));
+                shot.setIcon(shotlabel);
+            }
+        }
+    }
+
+
+    public static void removeShot(Set set){
+
+        for(Shot shot : set.getShotList()){
+            JLabel icon = shot.getIcon();
+            if(icon != null){
+                bPane.remove(icon);
+                bPane.revalidate();
+                bPane.repaint();
+                set.setCurrentShots(set.getCurrentShots()-1);
+            }
+        }
+        if(set.getCurrentShots() == 0){
+            removeCard(set);
+            //Deadwood.getInstance().payOut();
+        }
+    }
+
+    public static void removeCard(Set set){
+        JLabel icon = set.getCardIcon();
+        bPane.remove(icon);
+        bPane.revalidate();
+        bPane.repaint();
+    }
+    public static void flipCard(Set set){
+        removeCard(set);
+        placeCard(set, set.getCard().getImage());
+    }
 
 
 
