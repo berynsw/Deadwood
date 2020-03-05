@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -8,10 +9,19 @@ public class Set extends Room{
     int maxShots;
     int currentShots;
     Card card;
+    JLabel cardIcon;
     int x;
     int y;
     int h;
     int w;
+
+    public JLabel getCardIcon() {
+        return cardIcon;
+    }
+
+    public void setCardIcon(JLabel cardIcon) {
+        this.cardIcon = cardIcon;
+    }
 
     public Set(String name, int shots, List<Role> roles, List<String> adjacents, int x, int y, int h, int w, List<Shot> shotList){
         this.name = name;
@@ -24,6 +34,7 @@ public class Set extends Room{
         this.y = y;
         this.h = h;
         this.w = w;
+        this.cardIcon = null;
     }
 
     public List<Shot> getShotList() {
