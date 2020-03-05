@@ -11,7 +11,7 @@ public class Deadwood {
 
     private int cardsOnBoard = 10;
     private int days = 4;
-    private List<Player> players = new ArrayList<>();
+    private static List<Player> players = new ArrayList<>();
     private HashMap<String,Set> sets = new HashMap<>();
     private Stack<Card> deck = new Stack<>();
     public static Player currentPlayer = null;
@@ -45,11 +45,6 @@ public class Deadwood {
     public Room getTrailer() { return trailer; }
     public Office getOffice() { return office; }
 
-
-
-
-
-
     public static void main(String[] args) throws ParserConfigurationException {
         //populate rooms and cards from xml
         Document doc1;
@@ -70,15 +65,15 @@ public class Deadwood {
             System.out.println("Error = "+e);
         }
 
-
         board = new Board();
         board.setVisible(true);
         board.placeCardBacks(deadwood.sets);
 
-
         int num = board.getPlayerNum();
         addPlayers(num);
 
+        currentPlayer = players.get(0);
+        board.addName(currentPlayer);
         board.trailerPlayers(deadwood.getPlayers());
 
         while(deadwood.days > 0){
@@ -169,6 +164,8 @@ public class Deadwood {
         Scanner scan = new Scanner(System.in);
         boolean turn = true;
         String input;
+
+        currentPlayer = player;
 
         while(turn){
             System.out.printf("The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'.%n");

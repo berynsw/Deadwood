@@ -169,7 +169,6 @@ public class Player {
         return true;
     }
 
-
     // Display neighboring room, calls work() and upgrade() if appropriate
     public static boolean move(Player player, HashMap<String, Set> sets, Room trailer, Office office, Scanner scan){
         Deadwood deadwood = Deadwood.getInstance();
