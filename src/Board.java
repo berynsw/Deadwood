@@ -133,20 +133,32 @@ public class Board extends JFrame {
         return nums[option];
     }
 
-    public static void placeCard(int x, int y, String file){
+    public static void placeCard(Set set, String file){
         // Add a scene card to this room
         JLabel cardlabel = new JLabel();
         ImageIcon cIcon =  new ImageIcon(file);
         cardlabel.setIcon(cIcon);
-        cardlabel.setBounds(x,y,205,115);
+        cardlabel.setBounds(set.getX(),set.getY(),205,115);
         cardlabel.setOpaque(true);
         // Add the card to the lower layer
         bPane.add(cardlabel, new Integer(1));
+        set.setCardIcon(cardlabel);
+    }
+
+    public static void removeCard(Set set){
+        JLabel icon = set.getCardIcon();
+        bPane.remove(icon);
+        bPane.revalidate();
+        bPane.repaint();
+    }
+    public static void flipCard(Set set){
+        removeCard(set);
+        placeCard(set, set.getCard().getImage());
     }
 
     public static void placeCardBacks(HashMap<String, Set> sets){
         for(Set set : sets.values()){
-            placeCard(set.getX(), set.getY(), "images/CardBack.jpg");
+            placeCard(set, "images/CardBack.jpg");
         }
     }
    
@@ -184,16 +196,7 @@ public class Board extends JFrame {
         }
     }
 
-    public static void removeCard(Set set){
-        JLabel icon = set.getCardIcon();
-        bPane.remove(icon);
-        bPane.revalidate();
-        bPane.repaint();
-    }
-    public static void flipCard(Set set){
-        removeCard(set);
-        placeCard(set, set.getCard().getImage());
-    }
+
 
 
 

@@ -65,7 +65,7 @@ public class Deadwood {
         board = new Board();
         board.setVisible(true);
         board.placeCardBacks(deadwood.sets);
-
+        board.placeShots(deadwood.sets);
 
 
 
@@ -74,6 +74,11 @@ public class Deadwood {
 
         while(deadwood.days > 0){
             initDay(deadwood.players, deadwood.sets, deadwood.deck);
+
+
+
+            //board.flipCard(deadwood.sets.get("jail"));
+
             while(deadwood.cardsOnBoard > 1){
                 for (int i = 0; i < deadwood.players.size(); i++) {
                     takeTurn(deadwood.players.get(i), deadwood.players, deadwood.sets, deadwood.trailer, deadwood.office);
