@@ -20,10 +20,8 @@ public class Board extends JFrame {
     static JLabel boardlabel;
     static JLayeredPane bPane;
 
-
     static JLabel playerlabel;
     static JLabel mLabel;
-
 
     //JButtons
     JButton bAct;
@@ -42,7 +40,6 @@ public class Board extends JFrame {
     // JLayered Pane
 
     ArrayList<String> playerDice = new ArrayList<>(Arrays.asList("b1.png", "c1.png", "g1.png", "o1.png", "p1.png", "r1.png", "v1.png", "w1.png", "y1.png"));
-
 
     // Constructor
     public ArrayList<String> getPlayerDice() {
@@ -74,16 +71,6 @@ public class Board extends JFrame {
 
         //Initialize menu
         initMenu();
-
-        /*// Add a dice to represent a player.
-        // Role for Crusty the prospector. The x and y co-ordiantes are taken from Board.xml file
-        playerlabel = new JLabel();
-        ImageIcon pIcon = new ImageIcon("r2.png");
-        playerlabel.setIcon(pIcon);
-        //playerlabel.setBounds(114,227,pIcon.getIconWidth(),pIcon.getIconHeight());
-        playerlabel.setBounds(114, 227, 46, 46);
-        playerlabel.setVisible(false);
-        bPane.add(playerlabel, new Integer(3));*/
     }
 
     public void initMenu() {
@@ -93,10 +80,12 @@ public class Board extends JFrame {
         ImageIcon icon = new ImageIcon("images/board.jpg");
 
         // Create the Menu for action buttons
-        mLabel = new JLabel("MENU");
-        mLabel.setBounds(icon.getIconWidth() + 80, 0, 100, 20);
-        bPane.add(mLabel, new Integer(2));
+        if (mLabel == null) {
+            mLabel = new JLabel("MENU");
+            mLabel.setBounds(icon.getIconWidth() + 80, 0, 100, 20);
+            bPane.add(mLabel, new Integer(2));
 
+        }
         // Create Action buttons
         bAct = new JButton("ACT");
         bAct.setBackground(Color.white);
@@ -178,9 +167,9 @@ public class Board extends JFrame {
         bPane.repaint();
     }
 
-    public void clearMove() {
+    public void clearMoves() {
 
-        bPane.remove(mLabel);
+        //bPane.remove(mLabel);
         bPane.remove(bAdj1);
         bPane.remove(bAdj2);
         bPane.remove(bAdj3);
@@ -188,7 +177,7 @@ public class Board extends JFrame {
         if (bAdj4 != null) {
             bPane.remove(bAdj4);
         }
-        
+
         bPane.revalidate();
         bPane.repaint();
     }
@@ -200,9 +189,9 @@ public class Board extends JFrame {
 
         // Code for the different button clicks
         public void mouseClicked(MouseEvent e) {
-            ImageIcon icon = new ImageIcon("images/board.jpg");
+            //ImageIcon icon = new ImageIcon("images/board.jpg");
             bPane = getLayeredPane();
-
+            addName(deadwood.getCurrentPlayer());
             if (e.getSource() == bAct) {
                 //playerlabel.setVisible(true);
                 System.out.println("Acting is Selected\n");
@@ -217,88 +206,28 @@ public class Board extends JFrame {
                 String selectedRoom = ((JButton)e.getSource()).getText();
                 System.out.println(selectedRoom);
                 deadwood.getCurrentPlayer().setRoom(selectedRoom);
-                clearMove();
+                clearMoves();
                 initMenu();
             } else if (e.getSource() == bAdj2) {
                 String selectedRoom = ((JButton)e.getSource()).getText();
                 System.out.println(selectedRoom);
                 deadwood.getCurrentPlayer().setRoom(selectedRoom);
-                clearMove();
+                clearMoves();
                 initMenu();
             } else if (e.getSource() == bAdj3) {
                 String selectedRoom = ((JButton)e.getSource()).getText();
                 System.out.println(selectedRoom);
                 deadwood.getCurrentPlayer().setRoom(selectedRoom);
-                clearMove();
+                clearMoves();
                 initMenu();
             } else if (e.getSource() == bAdj4) {
                 String selectedRoom = ((JButton)e.getSource()).getText();
                 System.out.println(selectedRoom);
                 deadwood.getCurrentPlayer().setRoom(selectedRoom);
-                clearMove();
+                clearMoves();
                 initMenu();
             }
         }
-
-        /*public void clearButtons() {
-            bPane.remove(bAct);
-            bPane.remove(bRehearse);
-            bPane.remove(bMove);
-            bPane.revalidate();
-            bPane.repaint();
-        }/*
-
-        /*public void listRooms() {
-
-            clearButtons();
-
-            List<JButton> bNeibs = new ArrayList<>();
-
-            ImageIcon icon = new ImageIcon("images/board.jpg");
-            bPane = getLayeredPane();
-
-            List<String> neibs = deadwood.getNeighbors(deadwood.getCurrentPlayer().getRoom(), deadwood.getSets(),
-                    deadwood.getTrailer(), deadwood.getOffice());
-
-            int yPos = 30;
-
-            bAdj1 = new JButton(neibs.get(0));
-            bAdj1.setBackground(Color.white);
-            bAdj1.setBounds(icon.getIconWidth() + 40, yPos, 100, 20);
-            bAdj1.addMouseListener(new boardMouseListener());
-            bPane.add(bAdj1, new Integer(2));
-            yPos += 30;
-            bAdj[0] = bAdj1;
-
-            bAdj2 = new JButton(neibs.get(1));
-            bAdj2.setBackground(Color.white);
-            bAdj2.setBounds(icon.getIconWidth() + 40, yPos, 100, 20);
-            bAdj2.addMouseListener(new boardMouseListener());
-            bPane.add(bAdj2, new Integer(2));
-            yPos += 30;
-            bAdj[1] = bAdj2;
-
-            System.out.println(neibs.size());
-
-            if (bNeibs.size() > 2) {
-                bAdj3 = new JButton(neibs.get(2));
-                bAdj3.setBackground(Color.white);
-                bAdj3.setBounds(icon.getIconWidth() + 40, yPos, 100, 20);
-                bAdj3.addMouseListener(new boardMouseListener());
-                bPane.add(bAdj3, new Integer(2));
-                yPos += 30;
-                bAdj[2] = bAdj3;
-            }
-            if (bNeibs.size() > 3) {
-                bAdj4 = new JButton(neibs.get(3));
-                bAdj4.setBackground(Color.white);
-                bAdj4.setBounds(icon.getIconWidth() + 40, yPos, 100, 20);
-                bAdj4.addMouseListener(new boardMouseListener());
-                bPane.add(bAdj4, new Integer(2));
-                yPos += 30;
-                bAdj[3] = bAdj4;
-            }
-        }*/
 
         public void removeRooms(List rooms) {
 
