@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.util.*;
 
 public class Player {
@@ -9,7 +10,23 @@ public class Player {
     private String room;
     private Role role;
     private String icon;
+    private JLabel label;
+
+
+
     private boolean onCard;
+    private boolean turn;
+
+    public JLabel getLabel() {
+        return label;
+    }
+
+    public void setLabel(JLabel label) {
+        this.label = label;
+    }
+    public boolean isTurn() { return turn; }
+
+    public void setTurn(boolean turn) { this.turn = turn; }
 
     public boolean isOnCard() {
         return onCard;
@@ -29,6 +46,7 @@ public class Player {
         this.rank = 1;
         this.rehearsalTokens = 0;
         this.icon = icon;
+        this.turn = false;
     }
 
     public String getName() {

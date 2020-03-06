@@ -37,7 +37,8 @@ public class Board extends JFrame{
     JButton bTakeRole;
     JButton bRehearse;
     JButton bAct;
-    JButton bEnd;
+    JButton bUpgrade;
+
 
     ImageIcon icon;
 
@@ -70,8 +71,6 @@ public class Board extends JFrame{
         // Set the size of the GUI
         setSize(icon.getIconWidth()+200,icon.getIconHeight());
 
-
-
         // Add a dice to represent a player.
         // Role for Crusty the prospector. The x and y co-ordiantes are taken from Board.xml file
         playerlabel = new JLabel();
@@ -81,17 +80,24 @@ public class Board extends JFrame{
         playerlabel.setBounds(114,227,46,46);
         playerlabel.setVisible(false);
         bPane.add(playerlabel,new Integer(3));
-
-        // Create the Menu for action buttons
-        mLabel = new JLabel("MENU");
-        mLabel.setBounds(icon.getIconWidth()+40,0,100,20);
-        bPane.add(mLabel,new Integer(2));
-
-
     }
 
 
+    public void removeTurnButtons(){
+        bPane.remove(mLabel);
+        bPane.remove(bMove);
+        bPane.remove(bTakeRole);
+        bPane.remove(bRehearse);
+        bPane.remove(bAct);
+        bPane.remove(bUpgrade);
+        bPane.revalidate();
+        bPane.repaint();
+    }
     public void createTurnButtons(Player player){
+        mLabel = new JLabel(player.getName().toUpperCase()+"'S TURN");
+        mLabel.setBounds(icon.getIconWidth()+50,0,100,20);
+        bPane.add(mLabel,new Integer(2));
+
         bMove = new JButton("MOVE");
         bMove.setBackground(Color.white);
         bMove.setBounds(icon.getIconWidth()+10,30,150, 20);
@@ -116,41 +122,40 @@ public class Board extends JFrame{
         bAct.addMouseListener(new turnMouseListener(player));
         bPane.add(bAct, new Integer(2));
 
-        bEnd = new JButton("END");
-        bEnd.setBackground(Color.white);
-        bEnd.setBounds(icon.getIconWidth()+10, 150,150, 20);
-        bEnd.addMouseListener(new turnMouseListener(player));
-        bPane.add(bEnd, new Integer(2));
-    }
-   
-    // This class implements Mouse Events
-    class turnMouseListener implements MouseListener{
-        Player player;
+        bUpgrade = new JButton("ACT");
+        bUpgrade.setBackground(Color.white);
+        bUpgrade.setBounds(icon.getIconWidth()+10, 120,150, 20);
+        bUpgrade.addMouseListener(new turnMouseListener(player));
+        bPane.add(bUpgrade, new Integer(2));
 
-        public boardMouseListener(Player player){
-            this.player = player;
+    }
+    class turnMouseListener implements MouseListener{
+
+        public turnMouseListener(Player player){
         }
         public void mouseClicked(MouseEvent e) {
-            if (e.getSource()== bMove){
+            if (e.getSource() == bMove){
                 System.out.println("Move is Selected\n");
+                removeTurnButtons();
+                createMoveButtons();
             }
-            else if (e.getSource()== bTakeRole){
+            else if (e.getSource() == bTakeRole){
                 System.out.println("takeRole is Selected\n");
 //                Deadwood deadwood = Deadwood.getInstance();
 //                if(player.getRole() == null && deadwood.getSets().containsKey(player.getRoom())){
-//                    createRoleButtons(deadwood.getSets().get(player.getRoom()), player);
+                removeTurnButtons();
+                Player player = Deadwood.getInstance().getCurrentPlayer();
+                createRoleButtons(Deadwood.getInstance().getSets().get(player.getRoom()), player);
 //                }
             }
-            else if (e.getSource()== bRehearse){
+            else if (e.getSource() == bRehearse){
                 System.out.println("Rehearse is Selected\n");
             }
-            else if (e.getSource()== bAct){
+            else if (e.getSource() == bAct){
                 playerlabel.setVisible(true);
                 System.out.println("Acting is Selected\n");
             }
-            else if (e.getSource()== bEnd){
-                System.out.println("End is Selected\n");
-            }
+
         }
         public void mousePressed(MouseEvent e) {
         }
@@ -161,73 +166,9 @@ public class Board extends JFrame{
         public void mouseExited(MouseEvent e) {
         }
     }
-   
-    public void clearPlayerStats(){
-        bPane.remove(pIcon);
-        bPane.remove(pRank);
-        bPane.remove(pCredits);
-        bPane.remove(pDollars);
-        bPane.remove(pRehearsalTokens);
-        bPane.remove(pRoom);
-        bPane.remove(pRole);
-        bPane.remove(pOnCard);
-        bPane.revalidate();
-        bPane.repaint();
-    }
-
-    public void showPlayerStats(Player player){
-        pIcon = new JButton("Icon: "+player.getIcon().substring(12));
-        pIcon.setBackground(Color.white);
-        pIcon.setBounds(icon.getIconWidth()+10, 210,150, 20);
-        bPane.add(pIcon, new Integer(2));
-
-        //JButton pRank;
-        pRank = new JButton("Rank: "+player.getRank());
-        pRank.setBackground(Color.white);
-        pRank.setBounds(icon.getIconWidth()+10, 240,150, 20);
-        bPane.add(pRank, new Integer(2));
-
-        //JButton pCredits;
-        pCredits = new JButton("Credits: "+player.getCredits());
-        pCredits.setBackground(Color.white);
-        pCredits.setBounds(icon.getIconWidth()+10, 270,150, 20);
-        bPane.add(pCredits, new Integer(2));
-
-        //JButton pDollars;
-        pDollars = new JButton("Dollars: "+player.getDollars());
-        pDollars.setBackground(Color.white);
-        pDollars.setBounds(icon.getIconWidth()+10, 300,150, 20);
-        bPane.add(pDollars, new Integer(2));
-
-        //JButton pRehearsalTokens;
-        pRehearsalTokens = new JButton("Rehears Toks: "+player.getRehearsalTokens());
-        pRehearsalTokens.setBackground(Color.white);
-        pRehearsalTokens.setBounds(icon.getIconWidth()+10, 330,150, 20);
-        bPane.add(pRehearsalTokens, new Integer(2));
-
-        //JButton pRoom;
-        pRoom = new JButton("Room: "+player.getRoom());
-        pRoom.setBackground(Color.white);
-        pRoom.setBounds(icon.getIconWidth()+10, 330,150, 20);
-        bPane.add(pRoom, new Integer(2));
-
-        //JButton pRole;
-        pRole = new JButton("Role: "+player.getRole());
-        pRole.setBackground(Color.white);
-        pRole.setBounds(icon.getIconWidth()+10, 360,150, 20);
-        bPane.add(pRole, new Integer(2));
-
-        //JButton pOnCard;
-        pOnCard = new JButton("OnCard?: "+player.isOnCard());
-        pOnCard.setBackground(Color.white);
-        pOnCard.setBounds(icon.getIconWidth()+10, 390,150, 20);
-        bPane.add(pOnCard, new Integer(2));
-    }
 
 
-    
 
-    // This class implements Mouse Events
     class roleMouseListener implements MouseListener{
         Set set;
         Player player;
@@ -258,13 +199,17 @@ public class Board extends JFrame{
         public void mouseExited(MouseEvent e) {
         }
     }
+    public void removeRoleButtons(){
 
+    }
     public void createRoleButtons(Set set, Player player){
         for(Role role : set.getRoles()){
             if((!role.isFilled()) && player.getRank() >= role.getRank()){
                 JButton b = new JButton();
                 b.setBounds(role.getX(), role.getY(), 43, 43);
                 b.addMouseListener(new roleMouseListener(set, player));
+                b.setContentAreaFilled(false);
+                b.setBorder(BorderFactory.createBevelBorder(1));
                 bPane.add(b, 2);
                 role.setButton(b);
             }
@@ -274,13 +219,15 @@ public class Board extends JFrame{
                 JButton b = new JButton();
                 b.setBounds(set.getX()+role.getX(), set.getY()+role.getY(), 43, 43);
                 b.addMouseListener(new roleMouseListener(set, player));
+                b.setContentAreaFilled(false);
+                b.setBorder(BorderFactory.createBevelBorder(1));
                 bPane.add(b, 2);
                 role.setButton(b);
             }
         }
     }
 
-    // This class implements Mouse Events
+
     class moveMouseListener implements MouseListener{
         Player player;
         List<String> nebs;
@@ -304,19 +251,32 @@ public class Board extends JFrame{
         public void mouseExited(MouseEvent e) {
         }
     }
-    public void createMoveButtons(Player player){
-        Deadwood deadwood = Deadwood.getInstance();
-        List<String> nebs = deadwood.getNeighbors(player.getRoom());
+    public void removeMoveButtons(){
+        Player player = Deadwood.getInstance().getCurrentPlayer();
+        List<String> nebs = convertToRoom(player.getRoom()).getAdjacents();
+        for(String s : nebs) {
+            Room room = convertToRoom(s);
+        }
+    }
+    public void createMoveButtons(){
+        Player player = Deadwood.getInstance().getCurrentPlayer();
+        List<String> nebs = convertToRoom(player.getRoom()).getAdjacents();
         for(String s : nebs){
             Room room = convertToRoom(s);
             JButton b = new JButton();
+
+            //??
+            b.setBackground(Color.white);
+            b.setContentAreaFilled(true);
+            b.setBorder(BorderFactory.createBevelBorder(1));
+            //??
+
             b.setBounds(room.getX(), room.getY(), room.getH(), room.getW());
             b.addMouseListener(new moveMouseListener(player, nebs));
-            bPane.add(b, 2);
+            bPane.add(b, 4);
             room.setButton(b);
         }
     }
-
     public Room convertToRoom(String s){
         Deadwood deadwood = Deadwood.getInstance();
         Room room = null;
@@ -403,9 +363,90 @@ public class Board extends JFrame{
         }
     }
 
+    public static void placePlayer(int x, int y, Player player) {
+        JLabel playerLabel = new JLabel();
+        ImageIcon pIcon = new ImageIcon(player.getIcon());
+        playerLabel.setIcon(pIcon);
+        playerLabel.setBounds(x, y, 46, 46);
+        playerLabel.setOpaque(true);
+        player.setLabel(playerLabel);
+        bPane.add(playerLabel, new Integer(1));
+    }
+    public static void removePlayer(Player player) {
+        JLabel rm = player.getLabel();
+        bPane.remove(rm);
+        bPane.revalidate();
+        bPane.repaint();
+    }
+
+    public static void placeInTrailer(Player player){
+
+    }
 
 
 
+
+
+    public void clearPlayerStats(){
+        bPane.remove(pIcon);
+        bPane.remove(pRank);
+        bPane.remove(pCredits);
+        bPane.remove(pDollars);
+        bPane.remove(pRehearsalTokens);
+        bPane.remove(pRoom);
+        bPane.remove(pRole);
+        bPane.remove(pOnCard);
+        bPane.revalidate();
+        bPane.repaint();
+    }
+    public void showPlayerStats(Player player){
+        pIcon = new JButton("Icon: "+player.getIcon().substring(12));
+        pIcon.setBackground(Color.white);
+        pIcon.setBounds(icon.getIconWidth()+10, 210,150, 20);
+        bPane.add(pIcon, new Integer(2));
+
+        //JButton pRank;
+        pRank = new JButton("Rank: "+player.getRank());
+        pRank.setBackground(Color.white);
+        pRank.setBounds(icon.getIconWidth()+10, 240,150, 20);
+        bPane.add(pRank, new Integer(2));
+
+        //JButton pCredits;
+        pCredits = new JButton("Credits: "+player.getCredits());
+        pCredits.setBackground(Color.white);
+        pCredits.setBounds(icon.getIconWidth()+10, 270,150, 20);
+        bPane.add(pCredits, new Integer(2));
+
+        //JButton pDollars;
+        pDollars = new JButton("Dollars: "+player.getDollars());
+        pDollars.setBackground(Color.white);
+        pDollars.setBounds(icon.getIconWidth()+10, 300,150, 20);
+        bPane.add(pDollars, new Integer(2));
+
+        //JButton pRehearsalTokens;
+        pRehearsalTokens = new JButton("Rehears Toks: "+player.getRehearsalTokens());
+        pRehearsalTokens.setBackground(Color.white);
+        pRehearsalTokens.setBounds(icon.getIconWidth()+10, 330,150, 20);
+        bPane.add(pRehearsalTokens, new Integer(2));
+
+        //JButton pRoom;
+        pRoom = new JButton("Room: "+player.getRoom());
+        pRoom.setBackground(Color.white);
+        pRoom.setBounds(icon.getIconWidth()+10, 330,150, 20);
+        bPane.add(pRoom, new Integer(2));
+
+        //JButton pRole;
+        pRole = new JButton("Role: "+player.getRole());
+        pRole.setBackground(Color.white);
+        pRole.setBounds(icon.getIconWidth()+10, 360,150, 20);
+        bPane.add(pRole, new Integer(2));
+
+        //JButton pOnCard;
+        pOnCard = new JButton("OnCard?: "+player.isOnCard());
+        pOnCard.setBackground(Color.white);
+        pOnCard.setBounds(icon.getIconWidth()+10, 390,150, 20);
+        bPane.add(pOnCard, new Integer(2));
+    }
 
 
 }

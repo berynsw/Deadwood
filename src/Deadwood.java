@@ -17,6 +17,10 @@ public class Deadwood {
 
     private Room trailer = null;
     private Office office = null;
+    private Player currentPlayer;
+
+
+
     public static Board board;
 
     private static Deadwood deadwood = new Deadwood();
@@ -35,7 +39,8 @@ public class Deadwood {
     public Stack<Card> getDeck() { return deck; }
     public Room getTrailer() { return trailer; }
     public Office getOffice() { return office; }
-
+    public Player getCurrentPlayer() { return currentPlayer; }
+    public void setCurrentPlayer(Player currentPlayer) { this.currentPlayer = currentPlayer; }
 
 
 
@@ -69,25 +74,40 @@ public class Deadwood {
 
 
 
-        int num = board.getPlayerNum();
-        addPlayers(num);
-        board.createTurnButtons();
-        board.showPlayerStats(deadwood.getPlayers().get(0));
-        //board.clearPlayerStats();
+
+        addPlayers(board.getPlayerNum());
+
+        //Set set = deadwood.sets.get("jail");
+        //board.flipCard(set);
+        //board.createRoleButtons(set, deadwood.getPlayers().get(0));
+
+
 
 
         while(deadwood.days > 0){
             initDay(deadwood.players, deadwood.sets, deadwood.deck);
 
+            board.createMoveButtons();
 
-            Set set = deadwood.sets.get("jail");
-            board.flipCard(set);
-            //board.createRoleButtons(set, deadwood.getPlayers().get(0));
-            board.createMoveButtons(deadwood.getPlayers().get(0));
 
             while(deadwood.cardsOnBoard > 1){
+
+
+
                 for (int i = 0; i < deadwood.players.size(); i++) {
-                    takeTurn(deadwood.players.get(i), deadwood.players, deadwood.sets, deadwood.trailer, deadwood.office);
+                    //takeTurn(deadwood.players.get(i), deadwood.players, deadwood.sets, deadwood.trailer, deadwood.office);
+                    deadwood.setCurrentPlayer(deadwood.players.get(i));
+                    deadwood.currentPlayer.setTurn(true);
+                    board.showPlayerStats(deadwood.getPlayers().get(i));
+
+                    while (deadwood.currentPlayer.isTurn()) {
+                        //BODY
+
+
+                    }
+                    board.clearPlayerStats();
+                    board.removeTurnButtons();
+
                     if (deadwood.cardsOnBoard == 1) {            //checks if day is over during player rotation
                         break;
                     }

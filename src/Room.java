@@ -10,6 +10,7 @@ public class Room {
     int y;
     int h;
     int w;
+    int playerCount;
     JButton button;
 
     public Room(String name, List<String> adj, int x, int y, int h, int w) {
@@ -19,6 +20,7 @@ public class Room {
         this.y = y;
         this.h = h;
         this.w = w;
+        this.playerCount = 0;
     }
 
     public Room() {
