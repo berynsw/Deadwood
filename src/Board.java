@@ -13,7 +13,7 @@ import javax.swing.ImageIcon;
 import java.awt.event.*;
 import javax.swing.JOptionPane;
 
-public class Board extends JFrame {
+public class Board extends JFrame{
 
     // JLabels
     static JLabel boardlabel;
@@ -100,10 +100,7 @@ public class Board extends JFrame {
 
     // This class implements Mouse Events
     class boardMouseListener implements MouseListener{
-
-        // Code for the different button clicks
         public void mouseClicked(MouseEvent e) {
-
             if (e.getSource()== bAct){
                 playerlabel.setVisible(true);
                 System.out.println("Acting is Selected\n");
@@ -122,6 +119,54 @@ public class Board extends JFrame {
         public void mouseEntered(MouseEvent e) {
         }
         public void mouseExited(MouseEvent e) {
+        }
+    }
+
+    // This class implements Mouse Events
+    class roleMouseListener implements MouseListener{
+        Set set;
+        Player player;
+        public roleMouseListener(Set set, Player player){
+            this.set = set;
+            this.player = player;
+        }
+        public void mouseClicked(MouseEvent e) {
+            for(Role role : this.set.getRoles()){
+                if(e.getSource() == role.getButton()){
+                    System.out.println("clicked "+role.getName()+" offcard");
+                    //takeRole(role)
+                }
+            }
+            for(Role role : this.set.getCard().getRoles()){
+                if(e.getSource() == role.getButton()){
+                    System.out.println("clicked "+role.getName()+" oncard");
+                    //takeRole(role)
+                }
+            }
+        }
+        public void mousePressed(MouseEvent e) {
+        }
+        public void mouseReleased(MouseEvent e) {
+        }
+        public void mouseEntered(MouseEvent e) {
+        }
+        public void mouseExited(MouseEvent e) {
+        }
+    }
+    public void createRoleButtons(Set set, Player player){
+        for(Role role : set.getRoles()){
+            JButton b = new JButton();
+            b.setBounds(role.getX(), role.getY(), 43, 43);
+            b.addMouseListener(new roleMouseListener(set, player));
+            bPane.add(b, 2);
+            role.setButton(b);
+        }
+        for(Role role : set.getCard().getRoles()){
+            JButton b = new JButton();
+            b.setBounds(set.getX()+role.getX(), set.getY()+role.getY(), 43, 43);
+            b.addMouseListener(new roleMouseListener(set, player));
+            bPane.add(b, 2);
+            role.setButton(b);
         }
     }
 
@@ -180,7 +225,6 @@ public class Board extends JFrame {
 
 
     public static void removeShot(Set set){
-
         for(Shot shot : set.getShotList()){
             JLabel icon = shot.getIcon();
             if(icon != null){

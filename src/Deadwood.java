@@ -76,8 +76,9 @@ public class Deadwood {
             initDay(deadwood.players, deadwood.sets, deadwood.deck);
 
 
-
-            //board.flipCard(deadwood.sets.get("jail"));
+            Set set = deadwood.sets.get("jail");
+            board.flipCard(set);
+            board.createRoleButtons(set, deadwood.getPlayers().get(0));
 
             while(deadwood.cardsOnBoard > 1){
                 for (int i = 0; i < deadwood.players.size(); i++) {
@@ -128,7 +129,6 @@ public class Deadwood {
 
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
-            System.out.println(board.getPlayerDice().get(i));
             String icon = "images/dice/"+board.getPlayerDice().get(i);
             deadwood.players.add(new Player("dummy", icon));
             if (playerCount <= 3) {

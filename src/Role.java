@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 public class Role {
     String name;
     int rank;
@@ -5,6 +7,7 @@ public class Role {
     boolean onCard;
     int x;
     int y;
+    JButton button;
 
     public Role(String name, int rank, boolean onCard, int x, int y){
         this.name = name;
@@ -13,6 +16,14 @@ public class Role {
         this.filled = false;
         this.x = x;
         this.y = y;
+    }
+
+    public JButton getButton() {
+        return button;
+    }
+
+    public void setButton(JButton button) {
+        this.button = button;
     }
 
     public int getX() {
