@@ -71,6 +71,10 @@ public class Deadwood {
 
         int num = board.getPlayerNum();
         addPlayers(num);
+        board.createTurnButtons();
+        board.showPlayerStats(deadwood.getPlayers().get(0));
+        //board.clearPlayerStats();
+
 
         while(deadwood.days > 0){
             initDay(deadwood.players, deadwood.sets, deadwood.deck);

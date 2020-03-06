@@ -22,6 +22,14 @@ public class Board extends JFrame{
 
     static JLabel playerlabel;
     static JLabel mLabel;
+    JButton pIcon;
+    JButton pRank;
+    JButton pCredits;
+    JButton pDollars;
+    JButton pRehearsalTokens;
+    JButton pRoom;
+    JButton pRole;
+    JButton pOnCard;
 
 
     //JButtons
@@ -29,6 +37,8 @@ public class Board extends JFrame{
     JButton bRehearse;
     JButton bMove;
     JButton bTakeRole;
+    JButton bEnd;
+
     ImageIcon icon;
 
     ArrayList<String> playerDice = new ArrayList<>(Arrays.asList("b1.png", "c1.png", "g1.png", "o1.png", "p1.png", "r1.png", "v1.png", "w1.png", "y1.png"));
@@ -82,30 +92,96 @@ public class Board extends JFrame{
 
 
     public void createTurnButtons(){
-        // Create Action buttons
-        bAct = new JButton("ACT");
-        bAct.setBackground(Color.white);
-        bAct.setBounds(icon.getIconWidth()+10, 30,100, 20);
-        bAct.addMouseListener(new turnMouseListener());
-        bPane.add(bAct, new Integer(2));
-
-        bRehearse = new JButton("REHEARSE");
-        bRehearse.setBackground(Color.white);
-        bRehearse.setBounds(icon.getIconWidth()+10,60,100, 20);
-        bRehearse.addMouseListener(new turnMouseListener());
-        bPane.add(bRehearse, new Integer(2));
-
         bMove = new JButton("MOVE");
         bMove.setBackground(Color.white);
-        bMove.setBounds(icon.getIconWidth()+10,90,100, 20);
+        bMove.setBounds(icon.getIconWidth()+10,30,150, 20);
         bMove.addMouseListener(new turnMouseListener());
         bPane.add(bMove, new Integer(2));
 
         bTakeRole = new JButton("TAKE ROLE");
         bTakeRole.setBackground(Color.white);
-        bTakeRole.setBounds(icon.getIconWidth()+10,120,100, 20);
+        bTakeRole.setBounds(icon.getIconWidth()+10,60,150, 20);
         bTakeRole.addMouseListener(new turnMouseListener());
         bPane.add(bTakeRole, new Integer(2));
+
+        bRehearse = new JButton("REHEARSE");
+        bRehearse.setBackground(Color.white);
+        bRehearse.setBounds(icon.getIconWidth()+10,90,150, 20);
+        bRehearse.addMouseListener(new turnMouseListener());
+        bPane.add(bRehearse, new Integer(2));
+
+        bAct = new JButton("ACT");
+        bAct.setBackground(Color.white);
+        bAct.setBounds(icon.getIconWidth()+10, 120,150, 20);
+        bAct.addMouseListener(new turnMouseListener());
+        bPane.add(bAct, new Integer(2));
+
+        bEnd = new JButton("END");
+        bEnd.setBackground(Color.white);
+        bEnd.setBounds(icon.getIconWidth()+10, 150,150, 20);
+        bEnd.addMouseListener(new turnMouseListener());
+        bPane.add(bEnd, new Integer(2));
+    }
+    public void clearPlayerStats(){
+        bPane.remove(pIcon);
+        bPane.remove(pRank);
+        bPane.remove(pCredits);
+        bPane.remove(pDollars);
+        bPane.remove(pRehearsalTokens);
+        bPane.remove(pRoom);
+        bPane.remove(pRole);
+        bPane.remove(pOnCard);
+        bPane.revalidate();
+        bPane.repaint();
+    }
+
+    public void showPlayerStats(Player player){
+        pIcon = new JButton("Icon: "+player.getIcon().substring(12));
+        pIcon.setBackground(Color.white);
+        pIcon.setBounds(icon.getIconWidth()+10, 210,150, 20);
+        bPane.add(pIcon, new Integer(2));
+
+        //JButton pRank;
+        pRank = new JButton("Rank: "+player.getRank());
+        pRank.setBackground(Color.white);
+        pRank.setBounds(icon.getIconWidth()+10, 240,150, 20);
+        bPane.add(pRank, new Integer(2));
+
+        //JButton pCredits;
+        pCredits = new JButton("Credits: "+player.getCredits());
+        pCredits.setBackground(Color.white);
+        pCredits.setBounds(icon.getIconWidth()+10, 270,150, 20);
+        bPane.add(pCredits, new Integer(2));
+
+        //JButton pDollars;
+        pDollars = new JButton("Dollars: "+player.getDollars());
+        pDollars.setBackground(Color.white);
+        pDollars.setBounds(icon.getIconWidth()+10, 300,150, 20);
+        bPane.add(pDollars, new Integer(2));
+
+        //JButton pRehearsalTokens;
+        pRehearsalTokens = new JButton("Rehears Toks: "+player.getRehearsalTokens());
+        pRehearsalTokens.setBackground(Color.white);
+        pRehearsalTokens.setBounds(icon.getIconWidth()+10, 330,150, 20);
+        bPane.add(pRehearsalTokens, new Integer(2));
+
+        //JButton pRoom;
+        pRoom = new JButton("Room: "+player.getRoom());
+        pRoom.setBackground(Color.white);
+        pRoom.setBounds(icon.getIconWidth()+10, 330,150, 20);
+        bPane.add(pRoom, new Integer(2));
+
+        //JButton pRole;
+        pRole = new JButton("Role: "+player.getRole());
+        pRole.setBackground(Color.white);
+        pRole.setBounds(icon.getIconWidth()+10, 360,150, 20);
+        bPane.add(pRole, new Integer(2));
+
+        //JButton pOnCard;
+        pOnCard = new JButton("OnCard?: "+player.isOnCard());
+        pOnCard.setBackground(Color.white);
+        pOnCard.setBounds(icon.getIconWidth()+10, 390,150, 20);
+        bPane.add(pOnCard, new Integer(2));
     }
 
 
@@ -195,10 +271,10 @@ public class Board extends JFrame{
 
 
     public static int getPlayerNum(){
-        String[] options = {"2 players", "3 players", "4 players", "5 players", "6 players", "7 players", "8 players"};
+        String[] players = {"2 players", "3 players", "4 players", "5 players", "6 players", "7 players", "8 players"};
         int[] nums = {2,3,4,5,6,7,8};
-        int option =  JOptionPane.showOptionDialog(null, "How many players?", "Message", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, options, options[0]);
-        return nums[option];
+        int index =  JOptionPane.showOptionDialog(null, "How many players?", "Message", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, players, players[0]);
+        return nums[index];
     }
 
     public static void placeCard(Set set, String file){
