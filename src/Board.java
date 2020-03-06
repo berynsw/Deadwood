@@ -33,10 +33,10 @@ public class Board extends JFrame{
 
 
     //JButtons
-    JButton bAct;
-    JButton bRehearse;
     JButton bMove;
     JButton bTakeRole;
+    JButton bRehearse;
+    JButton bAct;
     JButton bEnd;
 
     ImageIcon icon;
@@ -193,14 +193,7 @@ public class Board extends JFrame{
 //            this.player = player;
 //        }
         public void mouseClicked(MouseEvent e) {
-            if (e.getSource()== bAct){
-                playerlabel.setVisible(true);
-                System.out.println("Acting is Selected\n");
-            }
-            else if (e.getSource()== bRehearse){
-                System.out.println("Rehearse is Selected\n");
-            }
-            else if (e.getSource()== bMove){
+            if (e.getSource()== bMove){
                 System.out.println("Move is Selected\n");
             }
             else if (e.getSource()== bTakeRole){
@@ -209,6 +202,16 @@ public class Board extends JFrame{
 //                if(player.getRole() == null && deadwood.getSets().containsKey(player.getRoom())){
 //                    createRoleButtons(deadwood.getSets().get(player.getRoom()), player);
 //                }
+            }
+            else if (e.getSource()== bRehearse){
+                System.out.println("Rehearse is Selected\n");
+            }
+            else if (e.getSource()== bAct){
+                playerlabel.setVisible(true);
+                System.out.println("Acting is Selected\n");
+            }
+            else if (e.getSource()== bEnd){
+                System.out.println("End is Selected\n");
             }
         }
         public void mousePressed(MouseEvent e) {
@@ -252,21 +255,79 @@ public class Board extends JFrame{
         public void mouseExited(MouseEvent e) {
         }
     }
+
     public void createRoleButtons(Set set, Player player){
         for(Role role : set.getRoles()){
-            JButton b = new JButton();
-            b.setBounds(role.getX(), role.getY(), 43, 43);
-            b.addMouseListener(new roleMouseListener(set, player));
-            bPane.add(b, 2);
-            role.setButton(b);
+            if((!role.isFilled()) && player.getRank() >= role.getRank()){
+                JButton b = new JButton();
+                b.setBounds(role.getX(), role.getY(), 43, 43);
+                b.addMouseListener(new roleMouseListener(set, player));
+                bPane.add(b, 2);
+                role.setButton(b);
+            }
         }
         for(Role role : set.getCard().getRoles()){
-            JButton b = new JButton();
-            b.setBounds(set.getX()+role.getX(), set.getY()+role.getY(), 43, 43);
-            b.addMouseListener(new roleMouseListener(set, player));
-            bPane.add(b, 2);
-            role.setButton(b);
+            if((!role.isFilled()) && player.getRank() >= role.getRank()){
+                JButton b = new JButton();
+                b.setBounds(set.getX()+role.getX(), set.getY()+role.getY(), 43, 43);
+                b.addMouseListener(new roleMouseListener(set, player));
+                bPane.add(b, 2);
+                role.setButton(b);
+            }
         }
+    }
+
+    // This class implements Mouse Events
+    class moveMouseListener implements MouseListener{
+        Player player;
+        List<String> nebs;
+        public moveMouseListener(Player player, List<String> nebs){
+            this.player = player;
+            this.nebs = nebs;
+        }
+        public void mouseClicked(MouseEvent e) {
+            for(String s : nebs){
+                if(e.getSource() == convertToRoom(s).getButton()) {
+                    System.out.println("requested move to: "+s);
+                }
+            }
+        }
+        public void mousePressed(MouseEvent e) {
+        }
+        public void mouseReleased(MouseEvent e) {
+        }
+        public void mouseEntered(MouseEvent e) {
+        }
+        public void mouseExited(MouseEvent e) {
+        }
+    }
+    public void createMoveButtons(Player player){
+        Deadwood deadwood = Deadwood.getInstance();
+        List<String> nebs = deadwood.getNeighbors(player.getRoom());
+        for(String s : nebs){
+            Room room = convertToRoom(s);
+            JButton b = new JButton();
+            b.setBounds(room.getX(), room.getY(), room.getH(), room.getW());
+            b.addMouseListener(new moveMouseListener(player, nebs));
+            bPane.add(b, 2);
+            room.setButton(b);
+        }
+    }
+
+    public Room convertToRoom(String s){
+        Deadwood deadwood = Deadwood.getInstance();
+        Room room = null;
+        if(deadwood.getSets().containsKey(s)){
+            room = deadwood.getSets().get(s);
+            //if(room instanceof Set)
+        }
+        else if(s.equalsIgnoreCase("trailer")){
+            room = deadwood.getTrailer();
+        }
+        else if(s.equalsIgnoreCase("office")){
+            room = deadwood.getOffice();
+        }
+        return room;
     }
 
 

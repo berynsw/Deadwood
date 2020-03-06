@@ -10,10 +10,7 @@ public class Set extends Room{
     int currentShots;
     Card card;
     JLabel cardIcon;
-    int x;
-    int y;
-    int h;
-    int w;
+
 
     public JLabel getCardIcon() {
         return cardIcon;
@@ -40,21 +37,7 @@ public class Set extends Room{
     public List<Shot> getShotList() {
         return shotList;
     }
-    public int getX() {
-        return x;
-    }
 
-    public int getY() {
-        return y;
-    }
-
-    public int getH() {
-        return h;
-    }
-
-    public int getW() {
-        return w;
-    }
 
     public int getMaxShots() {
         return maxShots;

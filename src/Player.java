@@ -168,7 +168,7 @@ public class Player {
         }
         else{
             System.out.println("The neighboring rooms to your current room are:");
-            List<String> neighbors = deadwood.getNeighbors(player.getRoom(), sets, trailer, office);
+            List<String> neighbors = deadwood.getNeighbors(player.getRoom());
             for(String room : neighbors){
                 System.out.println(" "+room);
             }

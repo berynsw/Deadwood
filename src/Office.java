@@ -1,8 +1,6 @@
 import java.util.List;
 
 public class Office extends Room {
-
-
     private int[] rank = {2,3,4,5,6};
     private int[] dollarCost = {4,10,18,28,40};
     private int[] creditCost = {5,10,15,20,25};
@@ -10,8 +8,10 @@ public class Office extends Room {
     public Office(String name, List<String> adj) {
         this.name = name;
         this.adjacents = adj;
-
-
+        this.x = 9;
+        this.y = 459;
+        this.h = 208;
+        this.w = 209;
     }
     public int[] getRank() {
         return rank;
@@ -36,6 +36,4 @@ public class Office extends Room {
     public void setCreditCost(int[] creditCost) {
         this.creditCost = creditCost;
     }
-
-
 }

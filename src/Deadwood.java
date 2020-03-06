@@ -82,7 +82,8 @@ public class Deadwood {
 
             Set set = deadwood.sets.get("jail");
             board.flipCard(set);
-            board.createRoleButtons(set, deadwood.getPlayers().get(0));
+            //board.createRoleButtons(set, deadwood.getPlayers().get(0));
+            board.createMoveButtons(deadwood.getPlayers().get(0));
 
             while(deadwood.cardsOnBoard > 1){
                 for (int i = 0; i < deadwood.players.size(); i++) {
@@ -203,15 +204,15 @@ public class Deadwood {
 
     // Returns the list of rooms adjacent to the current location
     //  cases for if the current room is trailer office or set
-    public static List<String> getNeighbors(String room, HashMap<String, Set> sets, Room trailer, Room office){
+    public static List<String> getNeighbors(String room){
         if(room.equalsIgnoreCase("trailer")){
-            return trailer.getAdjacents();
+            return deadwood.trailer.getAdjacents();
         }
         else if(room.equalsIgnoreCase("office")){
-            return office.getAdjacents();
+            return deadwood.office.getAdjacents();
         }
-        else if(sets.get(room) != null){
-            return sets.get(room).getAdjacents();
+        else if(deadwood.sets.containsKey(room)){
+            return deadwood.sets.get(room).getAdjacents();
         }
         else{
             System.out.println("invalid room/location string in player");

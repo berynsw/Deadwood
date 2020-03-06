@@ -88,7 +88,7 @@ public class ParseXML{
                 }
             }
         }
-        return new Room("trailer", neighbors);
+        return new Room("trailer", neighbors, 991, 248, 194, 201);
     }
 
         // populates set data
