@@ -28,7 +28,8 @@ public class Board extends JFrame{
     JButton bAct;
     JButton bRehearse;
     JButton bMove;
-    // JLayered Pane
+    JButton bTakeRole;
+    ImageIcon icon;
 
     ArrayList<String> playerDice = new ArrayList<>(Arrays.asList("b1.png", "c1.png", "g1.png", "o1.png", "p1.png", "r1.png", "v1.png", "w1.png", "y1.png"));
 
@@ -49,7 +50,7 @@ public class Board extends JFrame{
 
         // Create the deadwood board
         boardlabel = new JLabel();
-        ImageIcon icon =  new ImageIcon("images/board.jpg");
+        icon =  new ImageIcon("images/board.jpg");
         boardlabel.setIcon(icon);
         boardlabel.setBounds(0,0,icon.getIconWidth(),icon.getIconHeight());
 
@@ -76,30 +77,45 @@ public class Board extends JFrame{
         mLabel.setBounds(icon.getIconWidth()+40,0,100,20);
         bPane.add(mLabel,new Integer(2));
 
+
+    }
+
+
+    public void createTurnButtons(){
         // Create Action buttons
         bAct = new JButton("ACT");
         bAct.setBackground(Color.white);
         bAct.setBounds(icon.getIconWidth()+10, 30,100, 20);
-        bAct.addMouseListener(new boardMouseListener());
+        bAct.addMouseListener(new turnMouseListener());
+        bPane.add(bAct, new Integer(2));
 
         bRehearse = new JButton("REHEARSE");
         bRehearse.setBackground(Color.white);
         bRehearse.setBounds(icon.getIconWidth()+10,60,100, 20);
-        bRehearse.addMouseListener(new boardMouseListener());
+        bRehearse.addMouseListener(new turnMouseListener());
+        bPane.add(bRehearse, new Integer(2));
 
         bMove = new JButton("MOVE");
         bMove.setBackground(Color.white);
         bMove.setBounds(icon.getIconWidth()+10,90,100, 20);
-        bMove.addMouseListener(new boardMouseListener());
-
-        // Place the action buttons in the top layer
-        bPane.add(bAct, new Integer(2));
-        bPane.add(bRehearse, new Integer(2));
+        bMove.addMouseListener(new turnMouseListener());
         bPane.add(bMove, new Integer(2));
+
+        bTakeRole = new JButton("TAKE ROLE");
+        bTakeRole.setBackground(Color.white);
+        bTakeRole.setBounds(icon.getIconWidth()+10,120,100, 20);
+        bTakeRole.addMouseListener(new turnMouseListener());
+        bPane.add(bTakeRole, new Integer(2));
     }
 
+
     // This class implements Mouse Events
-    class boardMouseListener implements MouseListener{
+    class turnMouseListener implements MouseListener{
+//        Player player;
+//
+//        public boardMouseListener(Player player){
+//            this.player = player;
+//        }
         public void mouseClicked(MouseEvent e) {
             if (e.getSource()== bAct){
                 playerlabel.setVisible(true);
@@ -110,6 +126,13 @@ public class Board extends JFrame{
             }
             else if (e.getSource()== bMove){
                 System.out.println("Move is Selected\n");
+            }
+            else if (e.getSource()== bTakeRole){
+                System.out.println("takeRole is Selected\n");
+//                Deadwood deadwood = Deadwood.getInstance();
+//                if(player.getRole() == null && deadwood.getSets().containsKey(player.getRoom())){
+//                    createRoleButtons(deadwood.getSets().get(player.getRoom()), player);
+//                }
             }
         }
         public void mousePressed(MouseEvent e) {
