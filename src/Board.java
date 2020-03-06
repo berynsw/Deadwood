@@ -91,37 +91,77 @@ public class Board extends JFrame{
     }
 
 
-    public void createTurnButtons(){
+    public void createTurnButtons(Player player){
         bMove = new JButton("MOVE");
         bMove.setBackground(Color.white);
         bMove.setBounds(icon.getIconWidth()+10,30,150, 20);
-        bMove.addMouseListener(new turnMouseListener());
+        bMove.addMouseListener(new turnMouseListener(player));
         bPane.add(bMove, new Integer(2));
 
         bTakeRole = new JButton("TAKE ROLE");
         bTakeRole.setBackground(Color.white);
         bTakeRole.setBounds(icon.getIconWidth()+10,60,150, 20);
-        bTakeRole.addMouseListener(new turnMouseListener());
+        bTakeRole.addMouseListener(new turnMouseListener(player));
         bPane.add(bTakeRole, new Integer(2));
 
         bRehearse = new JButton("REHEARSE");
         bRehearse.setBackground(Color.white);
         bRehearse.setBounds(icon.getIconWidth()+10,90,150, 20);
-        bRehearse.addMouseListener(new turnMouseListener());
+        bRehearse.addMouseListener(new turnMouseListener(player));
         bPane.add(bRehearse, new Integer(2));
 
         bAct = new JButton("ACT");
         bAct.setBackground(Color.white);
         bAct.setBounds(icon.getIconWidth()+10, 120,150, 20);
-        bAct.addMouseListener(new turnMouseListener());
+        bAct.addMouseListener(new turnMouseListener(player));
         bPane.add(bAct, new Integer(2));
 
         bEnd = new JButton("END");
         bEnd.setBackground(Color.white);
         bEnd.setBounds(icon.getIconWidth()+10, 150,150, 20);
-        bEnd.addMouseListener(new turnMouseListener());
+        bEnd.addMouseListener(new turnMouseListener(player));
         bPane.add(bEnd, new Integer(2));
     }
+   
+    // This class implements Mouse Events
+    class turnMouseListener implements MouseListener{
+        Player player;
+
+        public boardMouseListener(Player player){
+            this.player = player;
+        }
+        public void mouseClicked(MouseEvent e) {
+            if (e.getSource()== bMove){
+                System.out.println("Move is Selected\n");
+            }
+            else if (e.getSource()== bTakeRole){
+                System.out.println("takeRole is Selected\n");
+//                Deadwood deadwood = Deadwood.getInstance();
+//                if(player.getRole() == null && deadwood.getSets().containsKey(player.getRoom())){
+//                    createRoleButtons(deadwood.getSets().get(player.getRoom()), player);
+//                }
+            }
+            else if (e.getSource()== bRehearse){
+                System.out.println("Rehearse is Selected\n");
+            }
+            else if (e.getSource()== bAct){
+                playerlabel.setVisible(true);
+                System.out.println("Acting is Selected\n");
+            }
+            else if (e.getSource()== bEnd){
+                System.out.println("End is Selected\n");
+            }
+        }
+        public void mousePressed(MouseEvent e) {
+        }
+        public void mouseReleased(MouseEvent e) {
+        }
+        public void mouseEntered(MouseEvent e) {
+        }
+        public void mouseExited(MouseEvent e) {
+        }
+    }
+   
     public void clearPlayerStats(){
         bPane.remove(pIcon);
         bPane.remove(pRank);
@@ -185,44 +225,7 @@ public class Board extends JFrame{
     }
 
 
-    // This class implements Mouse Events
-    class turnMouseListener implements MouseListener{
-//        Player player;
-//
-//        public boardMouseListener(Player player){
-//            this.player = player;
-//        }
-        public void mouseClicked(MouseEvent e) {
-            if (e.getSource()== bMove){
-                System.out.println("Move is Selected\n");
-            }
-            else if (e.getSource()== bTakeRole){
-                System.out.println("takeRole is Selected\n");
-//                Deadwood deadwood = Deadwood.getInstance();
-//                if(player.getRole() == null && deadwood.getSets().containsKey(player.getRoom())){
-//                    createRoleButtons(deadwood.getSets().get(player.getRoom()), player);
-//                }
-            }
-            else if (e.getSource()== bRehearse){
-                System.out.println("Rehearse is Selected\n");
-            }
-            else if (e.getSource()== bAct){
-                playerlabel.setVisible(true);
-                System.out.println("Acting is Selected\n");
-            }
-            else if (e.getSource()== bEnd){
-                System.out.println("End is Selected\n");
-            }
-        }
-        public void mousePressed(MouseEvent e) {
-        }
-        public void mouseReleased(MouseEvent e) {
-        }
-        public void mouseEntered(MouseEvent e) {
-        }
-        public void mouseExited(MouseEvent e) {
-        }
-    }
+    
 
     // This class implements Mouse Events
     class roleMouseListener implements MouseListener{
