@@ -18,6 +18,7 @@ public class Deadwood {
     private Room trailer = null;
     private Office office = null;
     private Player currentPlayer;
+    private int playerIndex = 0;
 
 
 
@@ -41,12 +42,13 @@ public class Deadwood {
     public Office getOffice() { return office; }
     public Player getCurrentPlayer() { return currentPlayer; }
     public void setCurrentPlayer(Player currentPlayer) { this.currentPlayer = currentPlayer; }
+    public int getDays() { return days; }
 
 
 
 
 
-    public static void main(String[] args) throws ParserConfigurationException {
+    public static void main(String[] args) throws ParserConfigurationException, InterruptedException {
         //populate rooms and cards from xml
         Document doc1;
         Document doc2;
@@ -69,59 +71,63 @@ public class Deadwood {
 
         board = new Board();
         board.setVisible(true);
-        board.placeCardBacks(deadwood.sets);
-        board.placeShots(deadwood.sets);
-
-
-
 
         addPlayers(board.getPlayerNum());
+        deadwood.currentPlayer = deadwood.players.get(0);
 
-        //Set set = deadwood.sets.get("jail");
-        //board.flipCard(set);
-        //board.createRoleButtons(set, deadwood.getPlayers().get(0));
-
-
+        deadwood.initDay();
+        board.createTurnButtons();
 
 
-        while(deadwood.days > 0){
-            initDay(deadwood.players, deadwood.sets, deadwood.deck);
-
-            board.createMoveButtons();
-
-
-            while(deadwood.cardsOnBoard > 1){
-
-
-
-                for (int i = 0; i < deadwood.players.size(); i++) {
-                    //takeTurn(deadwood.players.get(i), deadwood.players, deadwood.sets, deadwood.trailer, deadwood.office);
-                    deadwood.setCurrentPlayer(deadwood.players.get(i));
-                    deadwood.currentPlayer.setTurn(true);
-                    board.showPlayerStats(deadwood.getPlayers().get(i));
-
-                    while (deadwood.currentPlayer.isTurn()) {
-                        //BODY
-
-
-                    }
-                    board.clearPlayerStats();
-                    board.removeTurnButtons();
-
-                    if (deadwood.cardsOnBoard == 1) {            //checks if day is over during player rotation
-                        break;
-                    }
-                }
-            }
-            deadwood.days--;
-        }
-        //displayTotalScores(deadwood.players);
     }
 
 
 
 
+    public static void endTurn(){
+        board.popUpMessage(deadwood.currentPlayer.getName()+"'s turn ended.");
+        deadwood.currentPlayer.setMoved(false);
+        if(deadwood.playerIndex == deadwood.players.size()){
+            deadwood.playerIndex = 0;
+        }
+        else{
+            deadwood.playerIndex++;
+        }
+        deadwood.currentPlayer = deadwood.players.get(deadwood.playerIndex);
 
+        board.removeTurnButtons();
+        board.createTurnButtons();
+    }
+
+
+
+    public static void endScene(Set set){
+        //remove players from roles in scene
+        for (int j = 0; j < deadwood.players.size(); j++) {
+            Player player = deadwood.players.get(j);
+            if (set.getName().equals(player.getRoom())) {
+                player.setRole(null);
+                player.setRehearsalTokens(0);
+            }
+        }
+        //remove card
+        set.setCard(null);
+        board.removeCard(set);
+        deadwood.cardsOnBoard--;
+
+        //end day
+        if(deadwood.cardsOnBoard <= 1){
+            deadwood.days--;
+            if(deadwood.days == 0){
+                //display final scores
+            }
+            else{
+                board.endOfDayDialog();
+                //start new day
+                deadwood.initDay();
+            }
+        }
+    }
 
 
 
@@ -149,9 +155,6 @@ public class Deadwood {
             System.out.println("Number of players must be between 2-8.");
             System.exit(0);
         }
-        //create scanner
-        Scanner scan = new Scanner(System.in);
-
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
             String icon = "images/dice/"+board.getPlayerDice().get(i);
@@ -170,16 +173,25 @@ public class Deadwood {
     }
 
     // Puts the players in trailer, a card from the deck into every set, and resets cardOnBoard value
-    public static void initDay(List<Player> players, HashMap<String,Set> sets, Stack<Card> deck){
+    public static void initDay(){
         //put all players in trailer
-        for(Player player : players){
-            player.setRoom("trailer");
+        for(Player player : deadwood.players){
             player.setRole(null);
+            if(player.getLabel() != null){
+                board.removePlayer(player);
+            }
+            board.placePlayerInRoom(player,"trailer");
         }
+        //put a card and shots in every set
+        deadwood.sets.forEach((name, set) -> {
+            set.setCard(deadwood.deck.pop());
+            board.placeCard(set, "images/CardBack.jpg");
 
-        //put a card in every set
-        sets.forEach((name, set) -> {
-            set.setCard(deck.pop());
+            set.setCurrentShots(set.getMaxShots());
+            for(Role role : set.getRoles()){
+                role.setFilled(false);
+            }
+            board.placeShots(set);
         });
         deadwood.cardsOnBoard = 10;
     }

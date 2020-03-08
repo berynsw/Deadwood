@@ -8,6 +8,9 @@ public class Role {
     int x;
     int y;
     JButton button;
+    JLabel label;
+
+
 
     public Role(String name, int rank, boolean onCard, int x, int y){
         this.name = name;
@@ -18,6 +21,13 @@ public class Role {
         this.y = y;
     }
 
+    public JLabel getLabel() {
+        return label;
+    }
+
+    public void setLabel(JLabel label) {
+        this.label = label;
+    }
     public JButton getButton() {
         return button;
     }

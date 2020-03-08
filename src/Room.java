@@ -11,6 +11,9 @@ public class Room {
     int h;
     int w;
     int playerCount;
+
+
+
     JButton button;
 
     public Room(String name, List<String> adj, int x, int y, int h, int w) {
@@ -26,6 +29,13 @@ public class Room {
     public Room() {
     }
 
+    public int getPlayerCount() {
+        return playerCount;
+    }
+
+    public void setPlayerCount(int playerCount) {
+        this.playerCount = playerCount;
+    }
     public JButton getButton() {
         return button;
     }

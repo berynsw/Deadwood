@@ -11,12 +11,21 @@ public class Player {
     private Role role;
     private String icon;
     private JLabel label;
+    private boolean moved;
 
 
 
     private boolean onCard;
     private boolean turn;
 
+
+    public boolean hasMoved() {
+        return moved;
+    }
+
+    public void setMoved(boolean moved) {
+        this.moved = moved;
+    }
     public JLabel getLabel() {
         return label;
     }
@@ -152,24 +161,12 @@ public class Player {
                 } else {
 
                     System.out.println("That about wraps it up, the scene is over!");
-                    set.setCurrentShots(0);
                     deadwood.payOut(players, set);
-                    //player is no longer in a role
-                    List<Player> playersOnSet = new ArrayList<>();
-                    for (int j = 0; j < players.size(); j++) {
-                        if (set.getName().equals(players.get(j).getRoom())) {
-                            playersOnSet.add(players.get(j));
-                        }
-                    }
-                    for (Player endPlayerRole : playersOnSet) {
-                        endPlayerRole.setRole(null);
-                        endPlayerRole.setRehearsalTokens(0);
-                    }
-                    set.setCard(null);
-                    deadwood.setCardsOnBoard(deadwood.getCardsOnBoard() - 1);
+
+
+
                 }
             }
-
             return false;
         } else {
             System.out.println("You are not currently acting in a role.");

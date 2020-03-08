@@ -10,7 +10,15 @@ public class Set extends Room{
     int currentShots;
     Card card;
     JLabel cardIcon;
+    boolean cardFlipped;
 
+    public boolean isCardFlipped() {
+        return cardFlipped;
+    }
+
+    public void setCardFlipped(boolean cardFlipped) {
+        this.cardFlipped = cardFlipped;
+    }
 
     public JLabel getCardIcon() {
         return cardIcon;
@@ -32,6 +40,7 @@ public class Set extends Room{
         this.h = h;
         this.w = w;
         this.cardIcon = null;
+        this.cardFlipped = false;
     }
 
     public List<Shot> getShotList() {
