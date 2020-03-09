@@ -19,6 +19,7 @@ public class Deadwood {
     private Office office = null;
     private Player currentPlayer;
     private int playerIndex = 0;
+    private int budget = 0;
 
 
 
@@ -43,10 +44,17 @@ public class Deadwood {
     public Player getCurrentPlayer() { return currentPlayer; }
     public void setCurrentPlayer(Player currentPlayer) { this.currentPlayer = currentPlayer; }
     public int getDays() { return days; }
+    //public void setBudget(int budget) { this.budget = budget; }
+    public int getBudget() { return budget; }
 
+    public void setPlayerBudget(Player player) {
+        deadwood.sets.forEach((name, set) -> {
 
-
-
+            if (name.equalsIgnoreCase(player.getRoom())) {
+                this.budget = set.getCard().getBudget();
+            }
+        });
+    }
 
     public static void main(String[] args) throws ParserConfigurationException, InterruptedException {
         //populate rooms and cards from xml
@@ -81,13 +89,10 @@ public class Deadwood {
 
     }
 
-
-
-
     public static void endTurn(){
         board.popUpMessage(deadwood.currentPlayer.getName()+"'s turn ended.");
         deadwood.currentPlayer.setMoved(false);
-        if(deadwood.playerIndex == deadwood.players.size()){
+        if(deadwood.playerIndex == deadwood.players.size()-1){
             deadwood.playerIndex = 0;
         }
         else{
@@ -129,19 +134,6 @@ public class Deadwood {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Adds players to the game
     //  Updates credits, rank, or number of days based on number of players.
     public static void addPlayers(int input) {
@@ -181,6 +173,7 @@ public class Deadwood {
                 board.removePlayer(player);
             }
             board.placePlayerInRoom(player,"trailer");
+            //board.initPlayer(deadwood.getPlayers());
         }
         //put a card and shots in every set
         deadwood.sets.forEach((name, set) -> {
@@ -233,6 +226,10 @@ public class Deadwood {
     }
 
 
+    public static Set getCurrentSet(Player player) {
+        HashMap<String, Set> sets = Deadwood.getInstance().getSets();
+        return sets.get(player.getRoom());
+    }
 
     // Returns the list of rooms adjacent to the current location
     //  cases for if the current room is trailer office or set

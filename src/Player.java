@@ -12,6 +12,8 @@ public class Player {
     private String icon;
     private JLabel label;
     private boolean moved;
+    private int x;
+    private int y;
 
 
 
@@ -49,6 +51,14 @@ public class Player {
         return icon;
     }
 
+    public int getX() { return x; }
+
+    public void setX(int x) { this.x = x; }
+
+    public int getY() { return y; }
+
+    public void setY(int y) { this.y = y; }
+
     //constructor
     public Player(String name, String icon) {
         this.name = name;
@@ -56,6 +66,9 @@ public class Player {
         this.rehearsalTokens = 0;
         this.icon = icon;
         this.turn = false;
+        this.x = 0;
+        this.y = 0;
+
     }
 
     public String getName() {
@@ -137,6 +150,8 @@ public class Player {
                 } else {
                     System.out.println("As compensation, you get nothing. Better luck next time!");
                 }
+
+                return false;
             }
             //if you succeed acting
             else {
@@ -159,19 +174,24 @@ public class Player {
                         System.out.println("You remove one shot counter. There is 1 shot left.");
                     }
                 } else {
-
                     System.out.println("That about wraps it up, the scene is over!");
+
+                    set.setCurrentShots(0);
+
+                    for (Player p : players) {
+                        if (set.getName().equals(p.getRoom())) {
+                            p.setRole(null);
+                            p.setRehearsalTokens(0);
+                        }
+                    }
                     deadwood.payOut(players, set);
-
-
-
                 }
             }
-            return false;
+            return true;
         } else {
             System.out.println("You are not currently acting in a role.");
+            return true;
         }
-        return true;
     }
 
 
