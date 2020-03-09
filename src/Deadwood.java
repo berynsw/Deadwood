@@ -87,7 +87,7 @@ public class Deadwood {
     public static void endTurn(){
         board.popUpMessage(deadwood.currentPlayer.getName()+"'s turn ended.");
         deadwood.currentPlayer.setMoved(false);
-        if(deadwood.playerIndex == deadwood.players.size()){
+        if(deadwood.playerIndex == deadwood.players.size()-1){
             deadwood.playerIndex = 0;
         }
         else{
@@ -196,41 +196,41 @@ public class Deadwood {
         deadwood.cardsOnBoard = 10;
     }
 
-    // Calls corresponding player action
-    public static void takeTurn(Player player, List<Player> players, HashMap<String, Set> sets, Room trailer, Office office) {
-        System.out.printf("%s it's your turn to play.%n", player.getName());
-        Scanner scan = new Scanner(System.in);
-        boolean turn = true;
-        String input;
-
-        while(turn){
-            System.out.printf("The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'.%n");
-            input = scan.nextLine().toLowerCase();
-            switch(input){
-                case "end":
-                    turn = false;
-                    break;
-                case "act":
-                    turn = player.act(player, sets.get(player.getRoom()), players);
-                    break;
-                case "move":
-                    turn = player.move(player, sets, trailer, office, scan);
-                    break;
-                case "work":
-                    turn = player.work(player, sets.get(player.getRoom()), scan);
-                    break;
-                case "rehearse":
-                    turn = player.rehearse(player, sets);
-                    break;
-                case "upgrade":
-                    upgrade(office, player, scan);
-                    break;
-                default:
-                    System.out.println("Unrecognized input.");
-            }
-        }
-        System.out.printf("%s's turn ended.%n%n",player.getName());
-    }
+//    // Calls corresponding player action
+//    public static void takeTurn(Player player, List<Player> players, HashMap<String, Set> sets, Room trailer, Office office) {
+//        System.out.printf("%s it's your turn to play.%n", player.getName());
+//        Scanner scan = new Scanner(System.in);
+//        boolean turn = true;
+//        String input;
+//
+//        while(turn){
+//            System.out.printf("The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'.%n");
+//            input = scan.nextLine().toLowerCase();
+//            switch(input){
+//                case "end":
+//                    turn = false;
+//                    break;
+//                case "act":
+//                    turn = player.act(player, sets.get(player.getRoom()), players);
+//                    break;
+//                case "move":
+//                    turn = player.move(player, sets, trailer, office, scan);
+//                    break;
+//                case "work":
+//                    turn = player.work(player, sets.get(player.getRoom()), scan);
+//                    break;
+//                case "rehearse":
+//                    turn = player.rehearse(player, sets);
+//                    break;
+//                case "upgrade":
+//                    upgrade(office, player, scan);
+//                    break;
+//                default:
+//                    System.out.println("Unrecognized input.");
+//            }
+//        }
+//        System.out.printf("%s's turn ended.%n%n",player.getName());
+//    }
 
 
 
@@ -253,64 +253,59 @@ public class Deadwood {
     }
 
     // Prints upgrade options and parses users input to upgrade rank
-    public static void upgrade(Office office, Player player, Scanner scan) {
+    public static void upgrade() {
+        Player player = deadwood.currentPlayer;
+        Office office = deadwood.office;
         if(player.getRoom().equalsIgnoreCase("office")){
-            System.out.println("The upgrade options are:");
-            for(int i = 0; i < 5; i++){
-                System.out.printf(" rank %d: %d dollars, %d credits%n", office.getRank()[i], office.getDollarCost()[i], office.getCreditCost()[i]);
-            }
-            System.out.println("select a rank");
-            String input = scan.nextLine();
             int rank = 0;
-            try{
-                rank = Integer.parseInt(input);
-                if(rank > player.getRank()){
-                    System.out.println("would you like to pay with 'dollars' or 'credits'?");
-                    input = scan.nextLine();
-                    if(input.equalsIgnoreCase("dollars")){
-                        int dollars = player.getDollars();
-                        for(int i = 0; i < 5; i++){
-                            if(rank == office.getRank()[i]){
-                                if(dollars >= office.getDollarCost()[i]){
-                                    player.setDollars(player.getDollars() - office.getDollarCost()[i]);
-                                    player.setRank(rank);
-                                    System.out.printf("You upgraded to rank %d!%n",player.getRank());
-                                }
-                                else{
-                                    System.out.println("You don't have enough dollars for that rank. Try again.");
-                                }
+            String[] ranks = {"Rank 2", "Rank 3", "Rank 4", "Rank 5", "Rank 6"};
+            int ranki =  JOptionPane.showOptionDialog(null, "What rank would you like to upgrade to?", "Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, ranks, ranks[0]);
+            rank = office.getRank()[ranki];
+            if(rank > player.getRank()){
+
+                String[] currencies = {"Dollars", "Credits"};
+                int curri =  JOptionPane.showOptionDialog(null, "Would you like to pay with dollars or credits?", "Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, currencies, currencies[0]);
+                String input = currencies[curri];
+
+                if(input.equalsIgnoreCase("dollars")){
+                    int dollars = player.getDollars();
+                    for(int i = 0; i < 5; i++){
+                        if(rank == office.getRank()[i]){
+                            if(dollars >= office.getDollarCost()[i]){
+                                player.setDollars(player.getDollars() - office.getDollarCost()[i]);
+                                player.setRank(rank);
+                                board.popUpMessage("You upgraded to rank "+player.getRank());
+                            }
+                            else{
+                                board.popUpMessage("You don't have enough dollars for that!");
                             }
                         }
                     }
-                    else if(input.equalsIgnoreCase("credits")){
-                        int credits = player.getCredits();
-                        for(int i = 0; i < 5; i++){
-                            if(rank == office.getRank()[i]){
-                                if(credits >= office.getCreditCost()[i]){
-                                    player.setCredits(player.getCredits() - office.getCreditCost()[i]);
-                                    player.setRank(rank);
-                                    System.out.printf("you upgraded to rank %d%n",player.getRank());
-                                }
-                                else{
-                                    System.out.println("You don't have enough credits for that rank. Try again.");
-                                }
+                }
+                else if(input.equalsIgnoreCase("credits")){
+                    int credits = player.getCredits();
+                    for(int i = 0; i < 5; i++){
+                        if(rank == office.getRank()[i]){
+                            if(credits >= office.getCreditCost()[i]){
+                                player.setCredits(player.getCredits() - office.getCreditCost()[i]);
+                                player.setRank(rank);
+                                board.popUpMessage("You upgraded to rank "+player.getRank());
+                            }
+                            else{
+                                board.popUpMessage("You don't have enough credits for that!");
                             }
                         }
                     }
-                    else{
-                        System.out.println("Invalid input. Try again.");
-                    }
                 }
-                else{
-                    System.out.println("invalid rank to upgrade to");
-                }
+
             }
-            catch(Exception e){
-                System.out.println("Must provide an integer rank");
+            else{
+                board.popUpMessage("That's not higher than your current rank!");
             }
+
         }
         else{
-            System.out.println("You need to be in the casting office to upgrade.");
+            board.popUpMessage("You need to be in the casting office to upgrade.");
         }
     }
 
