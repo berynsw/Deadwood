@@ -21,8 +21,6 @@ public class Deadwood {
     private int playerIndex = 0;
     private int budget = 0;
 
-
-
     public static Board board;
 
     private static Deadwood deadwood = new Deadwood();
@@ -173,8 +171,9 @@ public class Deadwood {
                 board.removePlayer(player);
             }
             board.placePlayerInRoom(player,"trailer");
-            //board.initPlayer(deadwood.getPlayers());
+            //board.initPlayer(player);
         }
+        //board.initPlayer(deadwood.getPlayers());
         //put a card and shots in every set
         deadwood.sets.forEach((name, set) -> {
             set.setCard(deadwood.deck.pop());
@@ -216,7 +215,7 @@ public class Deadwood {
                     turn = player.rehearse(player, sets);
                     break;
                 case "upgrade":
-                    upgrade(office, player, scan);
+                    //upgrade();
                     break;
                 default:
                     System.out.println("Unrecognized input.");
@@ -249,7 +248,7 @@ public class Deadwood {
         }
     }
 
-    // Prints upgrade options and parses users input to upgrade rank
+    /*// Prints upgrade options and parses users input to upgrade rank
     public static void upgrade(Office office, Player player, Scanner scan) {
         if(player.getRoom().equalsIgnoreCase("office")){
             System.out.println("The upgrade options are:");
@@ -308,6 +307,63 @@ public class Deadwood {
         }
         else{
             System.out.println("You need to be in the casting office to upgrade.");
+        }
+    }*/
+
+    // Prints upgrade options and parses users input to upgrade rank
+    public static void upgrade() {
+        Player player = deadwood.currentPlayer;
+        Office office = deadwood.office;
+        if(player.getRoom().equalsIgnoreCase("office")){
+            int rank = 0;
+            String[] ranks = {"Rank 2", "Rank 3", "Rank 4", "Rank 5", "Rank 6"};
+            int ranki =  JOptionPane.showOptionDialog(null, "What rank would you like to upgrade to?", "Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, ranks, ranks[0]);
+            rank = office.getRank()[ranki];
+            if(rank > player.getRank()){
+
+                String[] currencies = {"Dollars", "Credits"};
+                int curri =  JOptionPane.showOptionDialog(null, "Would you like to pay with dollars or credits?", "Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, currencies, currencies[0]);
+                String input = currencies[curri];
+
+                if(input.equalsIgnoreCase("dollars")){
+                    int dollars = player.getDollars();
+                    for(int i = 0; i < 5; i++){
+                        if(rank == office.getRank()[i]){
+                            if(dollars >= office.getDollarCost()[i]){
+                                player.setDollars(player.getDollars() - office.getDollarCost()[i]);
+                                player.setRank(rank);
+                                board.popUpMessage("You upgraded to rank "+player.getRank());
+                            }
+                            else{
+                                board.popUpMessage("You don't have enough dollars for that!");
+                            }
+                        }
+                    }
+                }
+                else if(input.equalsIgnoreCase("credits")){
+                    int credits = player.getCredits();
+                    for(int i = 0; i < 5; i++){
+                        if(rank == office.getRank()[i]){
+                            if(credits >= office.getCreditCost()[i]){
+                                player.setCredits(player.getCredits() - office.getCreditCost()[i]);
+                                player.setRank(rank);
+                                board.popUpMessage("You upgraded to rank "+player.getRank());
+                            }
+                            else{
+                                board.popUpMessage("You don't have enough credits for that!");
+                            }
+                        }
+                    }
+                }
+
+            }
+            else{
+                board.popUpMessage("That's not higher than your current rank!");
+            }
+
+        }
+        else{
+            board.popUpMessage("You need to be in the casting office to upgrade.");
         }
     }
 

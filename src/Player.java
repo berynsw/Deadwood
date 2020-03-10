@@ -175,16 +175,10 @@ public class Player {
                     }
                 } else {
                     System.out.println("That about wraps it up, the scene is over!");
-
                     set.setCurrentShots(0);
 
-                    for (Player p : players) {
-                        if (set.getName().equals(p.getRoom())) {
-                            p.setRole(null);
-                            p.setRehearsalTokens(0);
-                        }
-                    }
                     deadwood.payOut(players, set);
+                    deadwood.endScene(set);
                 }
             }
             return true;
@@ -221,7 +215,7 @@ public class Player {
                 }
                 else if(input.equals("office")){
                     System.out.println("Since you moved to the office would you like to upgrade?");
-                    deadwood.upgrade(office, player, scan);
+                    //deadwood.upgrade();
                 }
                 return false;
             }

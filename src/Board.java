@@ -153,7 +153,7 @@ public class Board extends JFrame{
                 deadwood.setPlayerBudget(player);
 
                 if (player.getRole() != null) {
-                    //check if rehearsing is needed 
+                    //check if rehearsing is needed
                     if (player.getRehearsalTokens()  >= deadwood.getBudget()-1) {
                         popUpMessage("No need to rehearse again. Why don't you try acting?");
                     } else {
@@ -177,7 +177,7 @@ public class Board extends JFrame{
                 }
             }
             else if (e.getSource() == bAct){
-                if(player.hasMoved() == false){
+                if(player.hasMoved() == false && player.getRole() != null){
                     //act
                     Boolean actSuccess = player.act(player, deadwood.getCurrentSet(player), deadwood.getPlayers());
 
@@ -199,7 +199,7 @@ public class Board extends JFrame{
                     clearPlayerStats();
                     showPlayerStats(player);
                     //endTurn
-                    Deadwood.getInstance().endTurn();
+                    Deadwood.endTurn();
                 }
                 else{
                     popUpMessage("You can't act right now");
@@ -209,7 +209,7 @@ public class Board extends JFrame{
             else if (e.getSource() == bUpgrade){
 
                 if (player.getRoom().equalsIgnoreCase("office")) {
-                    popUpMessage("Upgrade needs to be implemented");
+                    deadwood.upgrade();
                 } else {
                     popUpMessage("You must be in the Casting Office to upgrade");
                 }
@@ -488,6 +488,9 @@ public class Board extends JFrame{
             removePlayer(player);
         }
 
+        player.setX(x);
+        player.setY(y);
+
         JLabel playerLabel = new JLabel();
         ImageIcon pIcon = new ImageIcon(player.getIcon());
         playerLabel.setIcon(pIcon);
@@ -528,16 +531,59 @@ public class Board extends JFrame{
         }
     }*/
 
+    /*public void initPlayer(Player player) {
+
+        String roomString = "trailer";
+
+        if(player.getRoom() != null){
+            Room previous = convertToRoom(player.getRoom());
+            previous.setPlayerCount(previous.getPlayerCount()-1);
+        }
+
+        Room room = convertToRoom(roomString);
+
+        int x = 991;
+        int y = 270;
+        int playerCount = room.getPlayerCount();
+
+        if(playerCount >= 4){
+            y += 50;
+            x += 50*(playerCount-4);
+        }
+        else{
+            x += 50*playerCount;
+        }
+
+        player.setX(x);
+        player.setY(y);
+        placePlayer(x, y, player);
+    }*/
+
     public void placePlayerInRoom(Player player, String roomString){
         if(player.getRoom() != null){
             Room previous = convertToRoom(player.getRoom());
             previous.setPlayerCount(previous.getPlayerCount()-1);
         }
 
-
-        Room room = convertToRoom(roomString);
         int x = 0;
         int y = 0;
+
+        Player p = Deadwood.getInstance().getPlayers().get(0);
+        int count = 1;
+
+        if (p != player && player.getX() != 0 && player.getY() != 0) {
+
+            while (p.getX() == player.getX() && p.getY() == player.getY()) {
+                if (count > 4) {
+
+                }
+            }
+            if (p.getX() == player.getX() && p.getY() == player.getY()) {
+
+            }
+        }
+
+        Room room = convertToRoom(roomString);
         int playerCount = room.getPlayerCount();
         if(roomString.equalsIgnoreCase("trailer")){
             x = 991;
@@ -565,7 +611,6 @@ public class Board extends JFrame{
             y = room.getY()+room.getH();
             x = room.getX()+35*playerCount-20;
         }
-
         placePlayer(x, y, player);
 
         player.setRoom(roomString);
