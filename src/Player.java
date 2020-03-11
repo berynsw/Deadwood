@@ -51,6 +51,8 @@ public class Player {
         return icon;
     }
 
+    public void setIcon(String icon) { this.icon = icon; }
+
     public int getX() { return x; }
 
     public void setX(int x) { this.x = x; }
@@ -187,7 +189,6 @@ public class Player {
             return true;
         }
     }
-
 
     // Display neighboring room, calls work() and upgrade() if appropriate
     public static boolean move(Player player, HashMap<String, Set> sets, Room trailer, Office office, Scanner scan){

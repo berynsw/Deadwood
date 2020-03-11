@@ -37,11 +37,23 @@ public class Board extends JFrame{
     JButton bAct;
     JButton bUpgrade;
     JButton bEnd;
+    JButton bBack;
 
     ImageIcon icon;
 
     ArrayList<String> playerDice = new ArrayList<>(Arrays.asList("b1.png", "c1.png", "g1.png", "o1.png", "p1.png", "r1.png", "v1.png", "w1.png", "y1.png"));
 
+    String[][] dice = {{"b1.png", "b2.png", "b3.png", "b4.png", "b5.png", "b6.png"},
+            {"c1.png", "c2.png", "c3.png", "c4.png", "c5.png", "c6.png"},
+            {"g1.png", "g2.png", "g3.png", "g4.png", "g5.png", "g6.png"},
+            {"o1.png", "o2.png", "o3.png", "o4.png", "o5.png", "o6.png"},
+            {"p1.png", "p2.png", "p3.png", "p4.png", "p5.png", "p6.png"},
+            {"r1.png", "r2.png", "r3.png", "r4.png", "r5.png", "r6.png"},
+            {"v1.png", "v2.png", "v3.png", "v4.png", "v5.png", "v6.png"},
+            {"w1.png", "w2.png", "w3.png", "w4.png", "w5.png", "w6.png"},
+            {"y1.png", "y2.png", "y3.png", "y4.png", "y5.png", "y6.png"}};
+
+    public String[][] getDice() { return dice; }
     // Constructor
     public ArrayList<String> getPlayerDice() {
         return playerDice;
@@ -149,10 +161,10 @@ public class Board extends JFrame{
             }
             else if (e.getSource() == bRehearse){
 
-                //update player budget
-                deadwood.setPlayerBudget(player);
-
                 if (player.getRole() != null) {
+                    //update player budget
+                    deadwood.setPlayerBudget(player);
+
                     //check if rehearsing is needed
                     if (player.getRehearsalTokens()  >= deadwood.getBudget()-1) {
                         popUpMessage("No need to rehearse again. Why don't you try acting?");
@@ -182,16 +194,10 @@ public class Board extends JFrame{
                     Boolean actSuccess = player.act(player, deadwood.getCurrentSet(player), deadwood.getPlayers());
 
                     if (actSuccess) {
+                        //remove set
+                        Set set = sets.get(player.getRoom());
+                        removeShot(set);
                         popUpMessage("You're not as bad an actor as you look, well done!");
-
-                        //Remove shots
-                        sets.forEach((name, set) -> {
-                            if (name.equalsIgnoreCase(player.getRoom())) {
-                                removeShot(set);
-                            }
-                        });
-
-
                     } else {
                         popUpMessage("You suck at acting! Give up on your dreams kid.");
                     }
@@ -210,6 +216,21 @@ public class Board extends JFrame{
 
                 if (player.getRoom().equalsIgnoreCase("office")) {
                     deadwood.upgrade();
+
+                    int playerNum = 0;
+                    for (Player p : deadwood.getPlayers()) {
+                        if (p == player) {
+                            break;
+                        }
+                        playerNum++;
+                    }
+
+                    player.setIcon("images/dice/" + dice[playerNum][player.getRank()-1]);
+                    removePlayer(player);
+                    placePlayerInRoom(player, "office");
+
+                    clearPlayerStats();
+                    showPlayerStats(player);
                 } else {
                     popUpMessage("You must be in the Casting Office to upgrade");
                 }
@@ -272,6 +293,10 @@ public class Board extends JFrame{
                     Deadwood.getInstance().endTurn();
                 }
             }
+            if (e.getSource() == bBack) {
+                removeRoleButtons(set, player);
+                createTurnButtons();
+            }
         }
         public void mousePressed(MouseEvent e) {
         }
@@ -293,12 +318,14 @@ public class Board extends JFrame{
                 bPane.remove(role.getButton());
             }
         }
+        bPane.remove(bBack);
         bPane.revalidate();
         bPane.repaint();
     }
     public void createRoleButtons(){
         Player player = Deadwood.getInstance().getCurrentPlayer();
-        if(player.getRole() == null && Deadwood.getInstance().getSets().containsKey(player.getRoom())){
+        Room room = convertToRoom(player.getRoom());
+        if(player.getRole() == null && room instanceof Set && ((Set) room).getCard() != null){
             removeTurnButtons();
             int y = 30;
             boolean found = false;
@@ -327,6 +354,15 @@ public class Board extends JFrame{
                     y += 30;
                 }
             }
+
+            bBack = new JButton("Back");
+            bBack.setBackground(Color.gray);
+            bBack.setOpaque(true);
+            bBack.setBorderPainted(false);
+            bBack.setBounds(icon.getIconWidth()+10, y, 150, 20);
+            bBack.addMouseListener(new roleMouseListener(set,player));
+            bPane.add(bBack,2);
+
             if(found == false){
                 popUpMessage("You can't act here!");
                 createTurnButtons();
@@ -356,6 +392,11 @@ public class Board extends JFrame{
                     createTurnButtons();
                 }
             }
+
+            if (e.getSource() == bBack) {
+                removeMoveButtons();
+                createTurnButtons();
+            }
         }
         public void mousePressed(MouseEvent e) {
         }
@@ -373,6 +414,7 @@ public class Board extends JFrame{
             Room room = convertToRoom(s);
             bPane.remove(room.getButton());
         }
+        bPane.remove(bBack);
         bPane.revalidate();
         bPane.repaint();
     }
@@ -393,6 +435,14 @@ public class Board extends JFrame{
                 room.setButton(b);
                 y += 30;
             }
+
+            bBack = new JButton("Back");
+            bBack.setBackground(Color.gray);
+            bBack.setOpaque(true);
+            bBack.setBorderPainted(false);
+            bBack.setBounds(icon.getIconWidth()+10, y, 150, 20);
+            bBack.addMouseListener(new moveMouseListener(player, nebs));
+            bPane.add(bBack,2);
         }
         else{
             popUpMessage("You can't move right now!");
@@ -569,6 +619,9 @@ public class Board extends JFrame{
         int y = 0;
 
         Player p = Deadwood.getInstance().getPlayers().get(0);
+
+
+
         int count = 1;
 
         if (p != player && player.getX() != 0 && player.getY() != 0) {
@@ -624,10 +677,6 @@ public class Board extends JFrame{
         }
     }
 
-
-
-
-
     public void clearPlayerStats(){
         bPane.remove(pIcon);
         bPane.remove(pRank);
@@ -640,65 +689,59 @@ public class Board extends JFrame{
         bPane.revalidate();
         bPane.repaint();
     }
-    public void showPlayerStats(Player player){
+    public void showPlayerStats(Player player) {
         //pIcon = new JButton("Icon: "+player.getIcon().substring(12));
         pIcon = new JLabel(player.getName());
         pIcon.setBackground(Color.white);
         pIcon.setBorder(BorderFactory.createEtchedBorder(0));
-        pIcon.setBounds(icon.getIconWidth()+10, 240,150, 20);
+        pIcon.setBounds(icon.getIconWidth() + 10, 240, 150, 20);
         bPane.add(pIcon, new Integer(2));
 
         //JButton pRank;
-        pRank = new JLabel("Rank: "+player.getRank());
+        pRank = new JLabel("Rank: " + player.getRank());
         pRank.setBackground(Color.white);
         pRank.setBorder(BorderFactory.createEtchedBorder(0));
-        pRank.setBounds(icon.getIconWidth()+10, 270,150, 20);
+        pRank.setBounds(icon.getIconWidth() + 10, 270, 150, 20);
         bPane.add(pRank, new Integer(2));
 
         //JButton pCredits;
-        pCredits = new JLabel("Credits: "+player.getCredits());
+        pCredits = new JLabel("Credits: " + player.getCredits());
         pCredits.setBackground(Color.white);
         pCredits.setBorder(BorderFactory.createEtchedBorder(0));
-        pCredits.setBounds(icon.getIconWidth()+10, 300,150, 20);
+        pCredits.setBounds(icon.getIconWidth() + 10, 300, 150, 20);
         bPane.add(pCredits, new Integer(2));
 
         //JButton pDollars;
-        pDollars = new JLabel("Dollars: "+player.getDollars());
+        pDollars = new JLabel("Dollars: " + player.getDollars());
         pDollars.setBackground(Color.white);
         pDollars.setBorder(BorderFactory.createEtchedBorder(0));
-        pDollars.setBounds(icon.getIconWidth()+10, 330,150, 20);
+        pDollars.setBounds(icon.getIconWidth() + 10, 330, 150, 20);
         bPane.add(pDollars, new Integer(2));
 
         //JButton pRehearsalTokens;
-        pRehearsalTokens = new JLabel("Rehears Toks: "+player.getRehearsalTokens());
+        pRehearsalTokens = new JLabel("Rehears Toks: " + player.getRehearsalTokens());
         pRehearsalTokens.setBackground(Color.white);
         pRehearsalTokens.setBorder(BorderFactory.createEtchedBorder(0));
-        pRehearsalTokens.setBounds(icon.getIconWidth()+10, 360,150, 20);
+        pRehearsalTokens.setBounds(icon.getIconWidth() + 10, 360, 150, 20);
         bPane.add(pRehearsalTokens, new Integer(2));
 
         //JButton pRoom;
-        pRoom = new JLabel("Room: "+player.getRoom());
+        pRoom = new JLabel("Room: " + player.getRoom());
         pRoom.setBackground(Color.white);
         pRoom.setBorder(BorderFactory.createEtchedBorder(0));
-        pRoom.setBounds(icon.getIconWidth()+10, 390,150, 20);
+        pRoom.setBounds(icon.getIconWidth() + 10, 390, 150, 20);
         bPane.add(pRoom, new Integer(2));
 
         //JButton pRole;
         if (player.getRole() == null) {
-           pRole = new JLabel("Role: None");
+            pRole = new JLabel("Role: None");
         } else {
-            pRole = new JLabel("Role: "+player.getRole().getName());
+            pRole = new JLabel("Role: " + player.getRole().getName());
         }
         pRole.setBackground(Color.white);
         pRole.setBorder(BorderFactory.createEtchedBorder(0));
-        pRole.setBounds(icon.getIconWidth()+10, 420,150, 20);
+        pRole.setBounds(icon.getIconWidth() + 10, 420, 150, 20);
         bPane.add(pRole, new Integer(2));
-
-        /*//JButton pOnCard;
-        pOnCard = new JButton("OnCard?: "+player.isOnCard());
-        pOnCard.setBackground(Color.white);
-        pOnCard.setBounds(icon.getIconWidth()+10, 450,150, 20);
-        bPane.add(pOnCard, new Integer(2));*/
     }
 
     public static void endOfDayDialog(){
