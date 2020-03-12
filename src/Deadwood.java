@@ -10,7 +10,8 @@ public class Deadwood {
 
 
     private int cardsOnBoard = 10;
-    private int days = 4;
+    private int days = 1;
+    private int maxDays = 4;
     private List<Player> players = new ArrayList<>();
     private HashMap<String,Set> sets = new HashMap<>();
     private Stack<Card> deck = new Stack<>();
@@ -116,10 +117,12 @@ public class Deadwood {
         deadwood.cardsOnBoard--;
 
         //end day
-        if(deadwood.cardsOnBoard <= 1){
-            deadwood.days--;
-            if(deadwood.days == 0){
+        if(deadwood.cardsOnBoard == 1){
+
+            deadwood.days++;
+            if(deadwood.days > deadwood.maxDays){
                 board.endOfGameDialog();
+                System.exit(0);
             }
             else{
                 board.endOfDayDialog();
@@ -138,15 +141,18 @@ public class Deadwood {
             System.out.println("Number of players must be between 2-8.");
             System.exit(0);
         }
+
+
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
-            Player player = new Player("dummy");
+            String name = JOptionPane.showInputDialog("Name of player " + (i + 1));
+            Player player = new Player(name);
             player.setIconList(board.getDice()[i]);
 
             String icon = "images/dice/" + player.getIconList()[0];
             player.setIcon(icon);
             if (playerCount <= 3) {
-                deadwood.days = 3;
+                deadwood.maxDays = 3;
             }
             else if (playerCount == 5) {
                 player.setCredits(2);
@@ -175,9 +181,12 @@ public class Deadwood {
         //board.initPlayer(deadwood.getPlayers());
         //put a card and shots in every set
         deadwood.sets.forEach((name, set) -> {
+            if(set.getCard() != null){
+                board.removeCard(set);
+            }
             set.setCard(deadwood.deck.pop());
             board.placeCard(set, "images/CardBack.jpg");
-
+            set.setCardFlipped(false);
             set.setCurrentShots(set.getMaxShots());
             for(Role role : set.getRoles()){
                 role.setFilled(false);

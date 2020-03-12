@@ -149,7 +149,7 @@ public class Player {
             //if you fail acting
             if (budget > (roll + player.getRehearsalTokens())) {
                 System.out.println("Apparently, you're not as good an actor as you think.");
-
+                deadwood.board.popUpMessage("You suck at acting! Give up on your dreams kid.");
                 //if failed off-card, still get a dollar
                 if (!player.getRole().isOnCard()) {
                     player.setDollars(player.getDollars() + 1);
@@ -176,17 +176,19 @@ public class Player {
                     deadwood.board.popUpMessage(player.getName()+" received 1cr and $1");
                 }
                 //decrement shot counter
-                if (set.currentShots > 1) {
-                    set.setCurrentShots(set.currentShots - 1);
+                set.setCurrentShots(set.getCurrentShots() - 1);
+                deadwood.board.removeShot(set);
+
+                if (set.getCurrentShots() >= 1) {
                     if (set.getCurrentShots() > 1) {
                         System.out.println("You remove one shot counter. There are " + set.getCurrentShots() + " shots left.");
                     } else {
                         System.out.println("You remove one shot counter. There is 1 shot left.");
                     }
+                //scene is over
                 } else {
                     System.out.println("That about wraps it up, the scene is over!");
-                    set.setCurrentShots(0);
-
+                    deadwood.board.popUpMessage("That about wraps it up, the scene is over.");
                     deadwood.payOut(players, set);
                     deadwood.endScene(set);
                 }

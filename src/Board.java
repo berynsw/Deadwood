@@ -28,7 +28,7 @@ public class Board extends JFrame{
     JLabel pRehearsalTokens;
     JLabel pRoom;
     JLabel pRole;
-    JLabel pOnCard;
+    JLabel pDays;
 
     //JButtons
     JButton bMove;
@@ -80,11 +80,9 @@ public class Board extends JFrame{
         // Set the size of the GUI
         setSize(icon.getIconWidth()+200,icon.getIconHeight());
 
-        mLabel = new JLabel("MENU");
-        mLabel.setBounds(icon.getIconWidth()+50,0,100,20);
-        bPane.add(mLabel,new Integer(2));
-
         Deadwood deadwood = Deadwood.getInstance();
+
+
     }
 
 
@@ -104,6 +102,10 @@ public class Board extends JFrame{
             clearPlayerStats();
         }
         showPlayerStats(Deadwood.getInstance().getCurrentPlayer());
+
+        mLabel = new JLabel("MENU");
+        mLabel.setBounds(icon.getIconWidth()+63,5,100,20);
+        bPane.add(mLabel,new Integer(2));
 
         bMove = new JButton("MOVE");
         bMove.setBackground(Color.white);
@@ -191,16 +193,8 @@ public class Board extends JFrame{
             else if (e.getSource() == bAct){
                 if(player.hasMoved() == false && player.getRole() != null){
                     //act
-                    Boolean actSuccess = player.act(player, deadwood.getCurrentSet(player), deadwood.getPlayers());
+                    player.act(player, deadwood.getCurrentSet(player), deadwood.getPlayers());
 
-                    if (actSuccess) {
-                        //remove set
-                        Set set = sets.get(player.getRoom());
-                        removeShot(set);
-                        popUpMessage("You're not as bad an actor as you look, well done!");
-                    } else {
-                        popUpMessage("You suck at acting! Give up on your dreams kid.");
-                    }
                     //update player stats before turn ends
                     clearPlayerStats();
                     showPlayerStats(player);
@@ -317,6 +311,7 @@ public class Board extends JFrame{
                 bPane.remove(role.getButton());
             }
         }
+        bPane.remove(mLabel);
         bPane.remove(bBack);
         bPane.revalidate();
         bPane.repaint();
@@ -326,6 +321,12 @@ public class Board extends JFrame{
         Room room = convertToRoom(player.getRoom());
         if(player.getRole() == null && room instanceof Set && ((Set) room).getCard() != null){
             removeTurnButtons();
+
+            mLabel = new JLabel("ROLES");
+            mLabel.setBounds(icon.getIconWidth()+63,5,100,20);
+            bPane.add(mLabel,new Integer(2));
+
+
             int y = 30;
             boolean found = false;
             Set set = Deadwood.getInstance().getSets().get(player.getRoom());
@@ -411,7 +412,8 @@ public class Board extends JFrame{
             Room room = convertToRoom(s);
             bPane.remove(room.getButton());
         }
-//        bPane.remove(bBack);
+        bPane.remove(mLabel);
+        bPane.remove(bBack);
         bPane.revalidate();
         bPane.repaint();
     }
@@ -419,6 +421,10 @@ public class Board extends JFrame{
         Player player = Deadwood.getInstance().getCurrentPlayer();
         if(player.getRole() == null && player.hasMoved() == false){
             removeTurnButtons();
+
+            mLabel = new JLabel("ROOMS");
+            mLabel.setBounds(icon.getIconWidth()+60,5,100,20);
+            bPane.add(mLabel,new Integer(2));
             List<String> nebs = convertToRoom(player.getRoom()).getAdjacents();
             int y = 30;
             for(String s : nebs){
@@ -431,13 +437,13 @@ public class Board extends JFrame{
                 room.setButton(b);
                 y += 30;
             }
-//            bBack = new JButton("Back");
-//            bBack.setBackground(Color.gray);
-//            bBack.setOpaque(true);
-//            bBack.setBorderPainted(false);
-//            bBack.setBounds(icon.getIconWidth()+10, y, 150, 20);
-//            bBack.addMouseListener(new moveMouseListener(player, nebs));
-//            bPane.add(bBack,2);
+            bBack = new JButton("Back");
+            bBack.setBackground(Color.gray);
+            bBack.setOpaque(true);
+            bBack.setBorderPainted(false);
+            bBack.setBounds(icon.getIconWidth()+10, y, 150, 20);
+            bBack.addMouseListener(new moveMouseListener(player, nebs));
+            bPane.add(bBack,2);
         }
         else{
             popUpMessage("You can't move right now!");
@@ -506,25 +512,17 @@ public class Board extends JFrame{
 
     public static void removeShot(Set set){
 
-        System.out.println("Shots: " + set.getCurrentShots());
+        //System.out.println("Shots: " + set.getCurrentShots());
 
         Deadwood deadwood = Deadwood.getInstance();
-
-        if(set.getCurrentShots() == 0){
-            //remove last shotCounter
-            JLabel icon = set.getShotList().get(set.getCurrentShots()).getIcon();
-            bPane.remove(icon);
-            bPane.revalidate();
-            bPane.repaint();
-
-            popUpMessage("That about wraps it up, the scene is over.");
-            removeCard(set);
-
-        } else if(set.getShotList().get(set.getCurrentShots()).getIcon() != null){
-            JLabel icon = set.getShotList().get(set.getCurrentShots()).getIcon();
-            bPane.remove(icon);
-            bPane.revalidate();
-            bPane.repaint();
+        for(Shot shot : set.getShotList()){
+            if(shot.getIcon() != null){
+                bPane.remove(shot.getIcon());
+                bPane.revalidate();
+                bPane.repaint();
+                shot.setIcon(null);
+                break;
+            }
         }
     }
 
@@ -561,10 +559,6 @@ public class Board extends JFrame{
 
     }
 
-
-
-
-
     public void placePlayerInRoom(Player player, String roomString){
 
 
@@ -598,13 +592,14 @@ public class Board extends JFrame{
         bPane.remove(pRehearsalTokens);
         bPane.remove(pRoom);
         bPane.remove(pRole);
+        bPane.remove(pDays);
         //bPane.remove(pOnCard);
         bPane.revalidate();
         bPane.repaint();
     }
     public void showPlayerStats(Player player) {
         //pIcon = new JButton("Icon: "+player.getIcon().substring(12));
-        pIcon = new JLabel(player.getIcon());
+        pIcon = new JLabel(player.getName() + "'s turn");
         pIcon.setBackground(Color.white);
         pIcon.setBorder(BorderFactory.createEtchedBorder(0));
         pIcon.setBounds(icon.getIconWidth() + 10, 240, 150, 20);
@@ -655,6 +650,13 @@ public class Board extends JFrame{
         pRole.setBorder(BorderFactory.createEtchedBorder(0));
         pRole.setBounds(icon.getIconWidth() + 10, 420, 150, 20);
         bPane.add(pRole, new Integer(2));
+
+        pDays = new JLabel("Day "+Deadwood.getInstance().getDays());
+        pDays.setBackground(Color.red);
+        pDays.setOpaque(true);
+        pDays.setBorder(BorderFactory.createEtchedBorder(0));
+        pDays.setBounds(icon.getIconWidth() + 10, 480, 150, 20);
+        bPane.add(pDays, new Integer(2));
     }
 
     public static void endOfDayDialog(){
