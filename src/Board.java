@@ -100,6 +100,7 @@ public class Board extends JFrame{
         if(pIcon != null){
             clearPlayerStats();
         }
+
         showPlayerStats(Deadwood.getInstance().getCurrentPlayer());
 
         mLabel = new JLabel("MENU");
@@ -159,7 +160,6 @@ public class Board extends JFrame{
                 createMoveButtons();
             }
             else if (e.getSource() == bTakeRole){
-                System.out.println("takeRole is Selected\n");
                 createRoleButtons();
             }
             else if (e.getSource() == bRehearse){
@@ -317,56 +317,75 @@ public class Board extends JFrame{
         bPane.revalidate();
         bPane.repaint();
     }
+    public boolean hasAvailableRole(Player player){
+
+        boolean found = false;
+        Room room = convertToRoom(player.getRoom());
+        if(player.getRole() == null && room instanceof Set && ((Set) room).getCard() != null) {
+
+            Set set = Deadwood.getInstance().getSets().get(player.getRoom());
+            for (Role role : set.getRoles()) {
+                if ((!role.isFilled()) && player.getRank() >= role.getRank()) {
+                    found = true;
+                }
+            }
+            for (Role role : set.getCard().getRoles()) {
+                if ((!role.isFilled()) && player.getRank() >= role.getRank()) {
+                    found = true;
+                }
+            }
+        }
+        return found;
+    }
     public void createRoleButtons(){
         Player player = Deadwood.getInstance().getCurrentPlayer();
         Room room = convertToRoom(player.getRoom());
         if(player.getRole() == null && room instanceof Set && ((Set) room).getCard() != null){
-            removeTurnButtons();
+            if(hasAvailableRole(player)){
+                removeTurnButtons();
 
-            mLabel = new JLabel("ROLES");
-            mLabel.setBounds(icon.getIconWidth()+63,5,100,20);
-            bPane.add(mLabel,new Integer(2));
+                mLabel = new JLabel("ROLES");
+                mLabel.setBounds(icon.getIconWidth()+63,5,100,20);
+                bPane.add(mLabel,new Integer(2));
 
-
-            int y = 30;
-            boolean found = false;
-            Set set = Deadwood.getInstance().getSets().get(player.getRoom());
-            for(Role role : set.getRoles()){
-                if((!role.isFilled()) && player.getRank() >= role.getRank()){
-                    found = true;
-                    JButton b = new JButton("OFF: "+role.getName().toUpperCase());
-                    b.setBackground(Color.white);
-                    b.setBounds(icon.getIconWidth()+10,y,150, 20);
-                    b.addMouseListener(new roleMouseListener(set, player));
-                    bPane.add(b, 2);
-                    role.setButton(b);
-                    y += 30;
+                int y = 30;
+                boolean found = false;
+                Set set = Deadwood.getInstance().getSets().get(player.getRoom());
+                for(Role role : set.getRoles()){
+                    if((!role.isFilled()) && player.getRank() >= role.getRank()){
+                        found = true;
+                        JButton b = new JButton("OFF: "+role.getName().toUpperCase());
+                        b.setBackground(Color.white);
+                        b.setBounds(icon.getIconWidth()+10,y,150, 20);
+                        b.addMouseListener(new roleMouseListener(set, player));
+                        bPane.add(b, 2);
+                        role.setButton(b);
+                        y += 30;
+                    }
                 }
-            }
-            for(Role role : set.getCard().getRoles()){
-                if((!role.isFilled()) && player.getRank() >= role.getRank()){
-                    found = true;
-                    JButton b = new JButton("ON: "+role.getName().toUpperCase());
-                    b.setBackground(Color.white);
-                    b.setBounds(icon.getIconWidth()+10,y,150, 20);
-                    b.addMouseListener(new roleMouseListener(set, player));
-                    bPane.add(b, 2);
-                    role.setButton(b);
-                    y += 30;
+                for(Role role : set.getCard().getRoles()){
+                    if((!role.isFilled()) && player.getRank() >= role.getRank()){
+                        found = true;
+                        JButton b = new JButton("ON: "+role.getName().toUpperCase());
+                        b.setBackground(Color.white);
+                        b.setBounds(icon.getIconWidth()+10,y,150, 20);
+                        b.addMouseListener(new roleMouseListener(set, player));
+                        bPane.add(b, 2);
+                        role.setButton(b);
+                        y += 30;
+                    }
                 }
+
+                bBack = new JButton("Back");
+                bBack.setBackground(Color.gray);
+                bBack.setOpaque(true);
+                bBack.setBorderPainted(false);
+                bBack.setBounds(icon.getIconWidth()+10, y, 150, 20);
+                bBack.addMouseListener(new roleMouseListener(set,player));
+                bPane.add(bBack,2);
             }
-
-            bBack = new JButton("Back");
-            bBack.setBackground(Color.gray);
-            bBack.setOpaque(true);
-            bBack.setBorderPainted(false);
-            bBack.setBounds(icon.getIconWidth()+10, y, 150, 20);
-            bBack.addMouseListener(new roleMouseListener(set,player));
-            bPane.add(bBack,2);
-
-            if(found == false){
-                popUpMessage("You can't act here!");
-                createTurnButtons();
+            else{
+                popUpMessage("You can't take a role right now!");
             }
         }
         else{
