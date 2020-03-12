@@ -12,12 +12,21 @@ public class Player {
     private String icon;
     private JLabel label;
     private boolean moved;
-
+    private int x;
+    private int y;
+    private String[] iconList;
 
 
     private boolean onCard;
     private boolean turn;
 
+    public String[] getIconList() {
+        return iconList;
+    }
+
+    public void setIconList(String[] iconList) {
+        this.iconList = iconList;
+    }
 
     public boolean hasMoved() {
         return moved;
@@ -49,13 +58,25 @@ public class Player {
         return icon;
     }
 
+    public void setIcon(String icon) { this.icon = icon; }
+
+    public int getX() { return x; }
+
+    public void setX(int x) { this.x = x; }
+
+    public int getY() { return y; }
+
+    public void setY(int y) { this.y = y; }
+
     //constructor
-    public Player(String name, String icon) {
+    public Player(String name) {
         this.name = name;
         this.rank = 1;
         this.rehearsalTokens = 0;
-        this.icon = icon;
         this.turn = false;
+        this.x = 0;
+        this.y = 0;
+
     }
 
     public String getName() {
@@ -118,7 +139,6 @@ public class Player {
     public static boolean act(Player player, Set set, List<Player> players) {
         Deadwood deadwood = Deadwood.getInstance();
         if (player.getRole()!= null) {
-
             Random r = new Random();
             int roll = r.nextInt(6) + 1;
             int budget = set.getCard().getBudget();
@@ -127,16 +147,19 @@ public class Player {
             System.out.printf("You rolled a %d and you have %d rehearsal chips!\n", roll, player.getRehearsalTokens());
 
             //if you fail acting
-            if (budget > roll + player.getRehearsalTokens()) {
+            if (budget > (roll + player.getRehearsalTokens())) {
                 System.out.println("Apparently, you're not as good an actor as you think.");
 
                 //if failed off-card, still get a dollar
                 if (!player.getRole().isOnCard()) {
                     player.setDollars(player.getDollars() + 1);
                     System.out.println("As compensation, you get 1 dollar.");
+                    deadwood.board.popUpMessage(player.getName()+" received $1");
                 } else {
                     System.out.println("As compensation, you get nothing. Better luck next time!");
                 }
+
+                return false;
             }
             //if you succeed acting
             else {
@@ -145,10 +168,12 @@ public class Player {
                 if (player.getRole().isOnCard()) {
                     player.setCredits(player.getCredits() + 2);
                     System.out.println("As compensation, you get 2 credits.");
+                    deadwood.board.popUpMessage(player.getName()+" received 2cr");
                 } else {
                     player.setCredits(player.getCredits() + 1);
                     player.setDollars(player.getDollars() + 1);
                     System.out.println("As compensations, you get 1 dollar and 1 credit.");
+                    deadwood.board.popUpMessage(player.getName()+" received 1cr and $1");
                 }
                 //decrement shot counter
                 if (set.currentShots > 1) {
@@ -159,21 +184,19 @@ public class Player {
                         System.out.println("You remove one shot counter. There is 1 shot left.");
                     }
                 } else {
-
                     System.out.println("That about wraps it up, the scene is over!");
+                    set.setCurrentShots(0);
+
                     deadwood.payOut(players, set);
-
-
-
+                    deadwood.endScene(set);
                 }
             }
-            return false;
+            return true;
         } else {
             System.out.println("You are not currently acting in a role.");
+            return true;
         }
-        return true;
     }
-
 
     // Display neighboring room, calls work() and upgrade() if appropriate
     public static boolean move(Player player, HashMap<String, Set> sets, Room trailer, Office office, Scanner scan){
@@ -201,7 +224,7 @@ public class Player {
                 }
                 else if(input.equals("office")){
                     System.out.println("Since you moved to the office would you like to upgrade?");
-                    deadwood.upgrade(office, player, scan);
+                    //deadwood.upgrade();
                 }
                 return false;
             }

@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.ImageIcon;
 import java.awt.event.*;
 import javax.swing.JOptionPane;
+import javax.swing.border.EtchedBorder;
 
 public class Board extends JFrame{
 
@@ -19,17 +20,15 @@ public class Board extends JFrame{
     static JLabel boardlabel;
     static JLayeredPane bPane;
 
-
     static JLabel mLabel;
-    JButton pIcon;
-    JButton pRank;
-    JButton pCredits;
-    JButton pDollars;
-    JButton pRehearsalTokens;
-    JButton pRoom;
-    JButton pRole;
-    JButton pOnCard;
-
+    JLabel pIcon;
+    JLabel pRank;
+    JLabel pCredits;
+    JLabel pDollars;
+    JLabel pRehearsalTokens;
+    JLabel pRoom;
+    JLabel pRole;
+    JLabel pOnCard;
 
     //JButtons
     JButton bMove;
@@ -38,13 +37,23 @@ public class Board extends JFrame{
     JButton bAct;
     JButton bUpgrade;
     JButton bEnd;
-
+    JButton bBack;
 
     ImageIcon icon;
 
     ArrayList<String> playerDice = new ArrayList<>(Arrays.asList("b1.png", "c1.png", "g1.png", "o1.png", "p1.png", "r1.png", "v1.png", "w1.png", "y1.png"));
 
+    String[][] dice = {{"b1.png", "b2.png", "b3.png", "b4.png", "b5.png", "b6.png"},
+            {"c1.png", "c2.png", "c3.png", "c4.png", "c5.png", "c6.png"},
+            {"g1.png", "g2.png", "g3.png", "g4.png", "g5.png", "g6.png"},
+            {"o1.png", "o2.png", "o3.png", "o4.png", "o5.png", "o6.png"},
+            {"p1.png", "p2.png", "p3.png", "p4.png", "p5.png", "p6.png"},
+            {"r1.png", "r2.png", "r3.png", "r4.png", "r5.png", "r6.png"},
+            {"v1.png", "v2.png", "v3.png", "v4.png", "v5.png", "v6.png"},
+            {"w1.png", "w2.png", "w3.png", "w4.png", "w5.png", "w6.png"},
+            {"y1.png", "y2.png", "y3.png", "y4.png", "y5.png", "y6.png"}};
 
+    public String[][] getDice() { return dice; }
     // Constructor
     public ArrayList<String> getPlayerDice() {
         return playerDice;
@@ -74,6 +83,8 @@ public class Board extends JFrame{
         mLabel = new JLabel("MENU");
         mLabel.setBounds(icon.getIconWidth()+50,0,100,20);
         bPane.add(mLabel,new Integer(2));
+
+        Deadwood deadwood = Deadwood.getInstance();
     }
 
 
@@ -135,6 +146,11 @@ public class Board extends JFrame{
         public turnMouseListener(){
         }
         public void mouseClicked(MouseEvent e) {
+
+            Deadwood deadwood = Deadwood.getInstance();
+            Player player = Deadwood.getInstance().getCurrentPlayer();
+            HashMap<String, Set> sets = deadwood.getSets();
+
             if (e.getSource() == bMove){
                 System.out.println("Move is Selected\n");
                 createMoveButtons();
@@ -144,20 +160,52 @@ public class Board extends JFrame{
                 createRoleButtons();
             }
             else if (e.getSource() == bRehearse){
-                Player player = Deadwood.getInstance().getCurrentPlayer();
-                if(player.hasMoved() == false){
-                    //act
-                    //endTurn
-                }
-                else{
-                    popUpMessage("You can't rehearse right now");
+
+                if (player.getRole() != null) {
+                    //update player budget
+                    deadwood.setPlayerBudget(player);
+
+                    //check if rehearsing is needed
+                    if (player.getRehearsalTokens()  >= deadwood.getBudget()-1) {
+                        popUpMessage("No need to rehearse again. Why don't you try acting?");
+                    } else {
+                        player.setRehearsalTokens(player.getRehearsalTokens() + 1);
+
+                        //grammar
+                        if (player.getRehearsalTokens() == 1) {
+                            popUpMessage("You now have 1 rehearsal token.");
+                        } else {
+                            popUpMessage("You now have " + player.getRehearsalTokens() + " rehearsal tokens.");
+                        }
+
+                        //update rehearsal tokens view before turn ends
+                        clearPlayerStats();
+                        showPlayerStats(player);
+
+                        deadwood.endTurn();
+                    }
+                } else {
+                    popUpMessage("You have no role to rehearse for!");
                 }
             }
             else if (e.getSource() == bAct){
-                Player player = Deadwood.getInstance().getCurrentPlayer();
-                if(player.hasMoved() == false){
+                if(player.hasMoved() == false && player.getRole() != null){
                     //act
+                    Boolean actSuccess = player.act(player, deadwood.getCurrentSet(player), deadwood.getPlayers());
+
+                    if (actSuccess) {
+                        //remove set
+                        Set set = sets.get(player.getRoom());
+                        removeShot(set);
+                        popUpMessage("You're not as bad an actor as you look, well done!");
+                    } else {
+                        popUpMessage("You suck at acting! Give up on your dreams kid.");
+                    }
+                    //update player stats before turn ends
+                    clearPlayerStats();
+                    showPlayerStats(player);
                     //endTurn
+                    Deadwood.endTurn();
                 }
                 else{
                     popUpMessage("You can't act right now");
@@ -165,11 +213,30 @@ public class Board extends JFrame{
                 System.out.println("Acting is Selected\n");
             }
             else if (e.getSource() == bUpgrade){
+                if (player.getRoom().equalsIgnoreCase("office")) {
+                    deadwood.upgrade();
+                    int playerNum = 0;
+                    for (Player p : deadwood.getPlayers()) {
+                        if (p == player) {
+                            break;
+                        }
+                        playerNum++;
+                    }
+
+                    player.setIcon("images/dice/" + dice[playerNum][player.getRank()-1]);
+                    removePlayer(player);
+                    placePlayerInRoom(player, "office");
+
+                    clearPlayerStats();
+                    showPlayerStats(player);
+                } else {
+                    popUpMessage("You must be in the Casting Office to upgrade");
+                }
 
                 System.out.println("Upgrade is Selected\n");
             }
             else if (e.getSource() == bEnd){
-                Deadwood.getInstance().endTurn();
+                deadwood.endTurn();
             }
         }
         public void mousePressed(MouseEvent e) {
@@ -181,8 +248,6 @@ public class Board extends JFrame{
         public void mouseExited(MouseEvent e) {
         }
     }
-
-
 
     class roleMouseListener implements MouseListener{
         Set set;
@@ -205,8 +270,8 @@ public class Board extends JFrame{
                     role.setFilled(true);
                     role.setLabel(player.getLabel());
 
-                    Deadwood.getInstance().endTurn();
                     createTurnButtons();
+                    Deadwood.getInstance().endTurn();
                 }
             }
             for(Role role : this.set.getCard().getRoles()){
@@ -216,15 +281,20 @@ public class Board extends JFrame{
                     removeRoleButtons(set, player);
 
                     //player takes role
+                    removePlayer(player);
                     placePlayer(role.getX()+set.getX(), role.getY()+set.getY(), player);
                     player.setRole(role);
                     player.setOnCard(true);
                     role.setFilled(true);
                     role.setLabel(player.getLabel());
 
-                    Deadwood.getInstance().endTurn();
                     createTurnButtons();
+                    Deadwood.getInstance().endTurn();
                 }
+            }
+            if (e.getSource() == bBack) {
+                removeRoleButtons(set, player);
+                createTurnButtons();
             }
         }
         public void mousePressed(MouseEvent e) {
@@ -247,12 +317,14 @@ public class Board extends JFrame{
                 bPane.remove(role.getButton());
             }
         }
+        bPane.remove(bBack);
         bPane.revalidate();
         bPane.repaint();
     }
     public void createRoleButtons(){
         Player player = Deadwood.getInstance().getCurrentPlayer();
-        if(player.getRole() == null && Deadwood.getInstance().getSets().containsKey(player.getRoom())){
+        Room room = convertToRoom(player.getRoom());
+        if(player.getRole() == null && room instanceof Set && ((Set) room).getCard() != null){
             removeTurnButtons();
             int y = 30;
             boolean found = false;
@@ -281,6 +353,15 @@ public class Board extends JFrame{
                     y += 30;
                 }
             }
+
+            bBack = new JButton("Back");
+            bBack.setBackground(Color.gray);
+            bBack.setOpaque(true);
+            bBack.setBorderPainted(false);
+            bBack.setBounds(icon.getIconWidth()+10, y, 150, 20);
+            bBack.addMouseListener(new roleMouseListener(set,player));
+            bPane.add(bBack,2);
+
             if(found == false){
                 popUpMessage("You can't act here!");
                 createTurnButtons();
@@ -290,8 +371,6 @@ public class Board extends JFrame{
             popUpMessage("You can't take a role right now!");
         }
     }
-
-
 
     class moveMouseListener implements MouseListener{
         Player player;
@@ -304,13 +383,16 @@ public class Board extends JFrame{
             for(String s : nebs){
                 if(e.getSource() == convertToRoom(s).getButton()) {
                     System.out.println("requested move to: "+s);
-
                     removeMoveButtons();
+
                     placePlayerInRoom(player, s);
                     player.setMoved(true);
-
                     createTurnButtons();
                 }
+            }
+            if (e.getSource() == bBack) {
+                removeMoveButtons();
+                createTurnButtons();
             }
         }
         public void mousePressed(MouseEvent e) {
@@ -329,6 +411,7 @@ public class Board extends JFrame{
             Room room = convertToRoom(s);
             bPane.remove(room.getButton());
         }
+//        bPane.remove(bBack);
         bPane.revalidate();
         bPane.repaint();
     }
@@ -336,7 +419,6 @@ public class Board extends JFrame{
         Player player = Deadwood.getInstance().getCurrentPlayer();
         if(player.getRole() == null && player.hasMoved() == false){
             removeTurnButtons();
-
             List<String> nebs = convertToRoom(player.getRoom()).getAdjacents();
             int y = 30;
             for(String s : nebs){
@@ -349,6 +431,13 @@ public class Board extends JFrame{
                 room.setButton(b);
                 y += 30;
             }
+//            bBack = new JButton("Back");
+//            bBack.setBackground(Color.gray);
+//            bBack.setOpaque(true);
+//            bBack.setBorderPainted(false);
+//            bBack.setBounds(icon.getIconWidth()+10, y, 150, 20);
+//            bBack.addMouseListener(new moveMouseListener(player, nebs));
+//            bPane.add(bBack,2);
         }
         else{
             popUpMessage("You can't move right now!");
@@ -401,8 +490,6 @@ public class Board extends JFrame{
         removeCard(set);
         placeCard(set, set.getCard().getImage());
     }
-
-
    
     public static void placeShots(Set set) {
         for (Shot shot : set.getShotList()) {
@@ -417,96 +504,91 @@ public class Board extends JFrame{
         }
     }
 
-
     public static void removeShot(Set set){
-        for(Shot shot : set.getShotList()){
-            JLabel icon = shot.getIcon();
-            if(icon != null){
-                bPane.remove(icon);
-                bPane.revalidate();
-                bPane.repaint();
-                set.setCurrentShots(set.getCurrentShots()-1);
-            }
-        }
+
+        System.out.println("Shots: " + set.getCurrentShots());
+
+        Deadwood deadwood = Deadwood.getInstance();
+
         if(set.getCurrentShots() == 0){
+            //remove last shotCounter
+            JLabel icon = set.getShotList().get(set.getCurrentShots()).getIcon();
+            bPane.remove(icon);
+            bPane.revalidate();
+            bPane.repaint();
+
+            popUpMessage("That about wraps it up, the scene is over.");
             removeCard(set);
-            //Deadwood.getInstance().payOut();
+
+        } else if(set.getShotList().get(set.getCurrentShots()).getIcon() != null){
+            JLabel icon = set.getShotList().get(set.getCurrentShots()).getIcon();
+            bPane.remove(icon);
+            bPane.revalidate();
+            bPane.repaint();
         }
     }
 
-    public static void placePlayer(int x, int y, Player player) {
-        if(player.getLabel() != null){
-            removePlayer(player);
-        }
+    public void placePlayer(int x, int y, Player player) {
+        removePlayer(player);
+
+        player.setX(x);
+        player.setY(y);
         JLabel playerLabel = new JLabel();
         ImageIcon pIcon = new ImageIcon(player.getIcon());
         playerLabel.setIcon(pIcon);
-        playerLabel.setBounds(x, y, 46, 46);
+        playerLabel.setBounds(x, y, 43, 43);
         playerLabel.setOpaque(true);
         player.setLabel(playerLabel);
         bPane.add(playerLabel, new Integer(4));
     }
-    public static void removePlayer(Player player) {
-        JLabel rm = player.getLabel();
-        bPane.remove(rm);
-        bPane.revalidate();
-        bPane.repaint();
-    }
+    public void removePlayer(Player player) {
+        if(player.getLabel() != null){
+            JLabel rm = player.getLabel();
+            bPane.remove(rm);
+            bPane.revalidate();
+            bPane.repaint();
+        }
 
-    public void placePlayerInRoom(Player player, String roomString){
         if(player.getRoom() != null){
             Room previous = convertToRoom(player.getRoom());
-            previous.setPlayerCount(previous.getPlayerCount()-1);
+            for(Slot slot : previous.getSlots()){
+                if(slot.getPlayer() == player){
+                    slot.setPlayer(null);
+                }
+            }
         }
+
+
+    }
+
+
+
+
+
+    public void placePlayerInRoom(Player player, String roomString){
+
 
 
         Room room = convertToRoom(roomString);
-        int x = 0;
-        int y = 0;
-        int playerCount = room.getPlayerCount();
-        if(roomString.equalsIgnoreCase("trailer")){
-            x = 991;
-            y = 270;
-            if(playerCount >= 4){
-                y += 50;
-                x += 50*(playerCount-4);
-            }
-            else{
-                x += 50*playerCount;
-            }
-        }
-        else if(roomString.equalsIgnoreCase("office")){
-            x = 9;
-            y = 469;
-            if(playerCount >= 4){
-                y += 50;
-                x += 50*(playerCount-4);
-            }
-            else{
-                x += 50*playerCount;
-            }
-        }
-        else if(Deadwood.getInstance().getSets().containsKey(roomString.toLowerCase())){
-            y = room.getY()+room.getH();
-            x = room.getX()+35*playerCount-20;
-        }
 
-        placePlayer(x, y, player);
-
+        for(Slot slot : room.getSlots()){
+            if(slot.getPlayer() == null){
+                slot.setPlayer(player);
+                placePlayer(slot.getX(),slot.getY(), player);
+                break;
+            }
+        }
         player.setRoom(roomString);
-        room.setPlayerCount(playerCount+1);
+
+        //flip card in set if necessary
         if(room instanceof Set){
             Set set = (Set)room;
-            if(set.isCardFlipped() == false){
+            if(set.getCard() != null && set.isCardFlipped() == false){
                 flipCard(set);
                 set.setCardFlipped(true);
             }
         }
     }
-
-
-
-
 
     public void clearPlayerStats(){
         bPane.remove(pIcon);
@@ -516,64 +598,155 @@ public class Board extends JFrame{
         bPane.remove(pRehearsalTokens);
         bPane.remove(pRoom);
         bPane.remove(pRole);
-        bPane.remove(pOnCard);
+        //bPane.remove(pOnCard);
         bPane.revalidate();
         bPane.repaint();
     }
-    public void showPlayerStats(Player player){
-        pIcon = new JButton("Icon: "+player.getIcon().substring(12));
+    public void showPlayerStats(Player player) {
+        //pIcon = new JButton("Icon: "+player.getIcon().substring(12));
+        pIcon = new JLabel(player.getIcon());
         pIcon.setBackground(Color.white);
-        pIcon.setBounds(icon.getIconWidth()+10, 240,150, 20);
+        pIcon.setBorder(BorderFactory.createEtchedBorder(0));
+        pIcon.setBounds(icon.getIconWidth() + 10, 240, 150, 20);
         bPane.add(pIcon, new Integer(2));
 
         //JButton pRank;
-        pRank = new JButton("Rank: "+player.getRank());
+        pRank = new JLabel("Rank: " + player.getRank());
         pRank.setBackground(Color.white);
-        pRank.setBounds(icon.getIconWidth()+10, 270,150, 20);
+        pRank.setBorder(BorderFactory.createEtchedBorder(0));
+        pRank.setBounds(icon.getIconWidth() + 10, 270, 150, 20);
         bPane.add(pRank, new Integer(2));
 
         //JButton pCredits;
-        pCredits = new JButton("Credits: "+player.getCredits());
+        pCredits = new JLabel("Credits: " + player.getCredits());
         pCredits.setBackground(Color.white);
-        pCredits.setBounds(icon.getIconWidth()+10, 300,150, 20);
+        pCredits.setBorder(BorderFactory.createEtchedBorder(0));
+        pCredits.setBounds(icon.getIconWidth() + 10, 300, 150, 20);
         bPane.add(pCredits, new Integer(2));
 
         //JButton pDollars;
-        pDollars = new JButton("Dollars: "+player.getDollars());
+        pDollars = new JLabel("Dollars: " + player.getDollars());
         pDollars.setBackground(Color.white);
-        pDollars.setBounds(icon.getIconWidth()+10, 330,150, 20);
+        pDollars.setBorder(BorderFactory.createEtchedBorder(0));
+        pDollars.setBounds(icon.getIconWidth() + 10, 330, 150, 20);
         bPane.add(pDollars, new Integer(2));
 
         //JButton pRehearsalTokens;
-        pRehearsalTokens = new JButton("Rehears Toks: "+player.getRehearsalTokens());
+        pRehearsalTokens = new JLabel("Rehears Toks: " + player.getRehearsalTokens());
         pRehearsalTokens.setBackground(Color.white);
-        pRehearsalTokens.setBounds(icon.getIconWidth()+10, 360,150, 20);
+        pRehearsalTokens.setBorder(BorderFactory.createEtchedBorder(0));
+        pRehearsalTokens.setBounds(icon.getIconWidth() + 10, 360, 150, 20);
         bPane.add(pRehearsalTokens, new Integer(2));
 
         //JButton pRoom;
-        pRoom = new JButton("Room: "+player.getRoom());
+        pRoom = new JLabel("Room: " + player.getRoom());
         pRoom.setBackground(Color.white);
-        pRoom.setBounds(icon.getIconWidth()+10, 390,150, 20);
+        pRoom.setBorder(BorderFactory.createEtchedBorder(0));
+        pRoom.setBounds(icon.getIconWidth() + 10, 390, 150, 20);
         bPane.add(pRoom, new Integer(2));
 
         //JButton pRole;
-        pRole = new JButton("Role: "+player.getRole());
+        if (player.getRole() == null) {
+            pRole = new JLabel("Role: None");
+        } else {
+            pRole = new JLabel("Role: " + player.getRole().getName());
+        }
         pRole.setBackground(Color.white);
-        pRole.setBounds(icon.getIconWidth()+10, 420,150, 20);
+        pRole.setBorder(BorderFactory.createEtchedBorder(0));
+        pRole.setBounds(icon.getIconWidth() + 10, 420, 150, 20);
         bPane.add(pRole, new Integer(2));
-
-        //JButton pOnCard;
-        pOnCard = new JButton("OnCard?: "+player.isOnCard());
-        pOnCard.setBackground(Color.white);
-        pOnCard.setBounds(icon.getIconWidth()+10, 450,150, 20);
-        bPane.add(pOnCard, new Integer(2));
     }
 
     public static void endOfDayDialog(){
-        int day = Deadwood.getInstance().getDays()+1;
-        JOptionPane.showMessageDialog(null, "Day "+day+" ended.");
+        JOptionPane.showMessageDialog(null, "Day ended.");
+    }
+
+    public static void endOfGameDialog(){
+        JOptionPane.showMessageDialog(null,"The game is over!");
+        String scores = "";
+        for(Player player : Deadwood.getInstance().getPlayers()){
+            scores += player.getName()+"'s final score: "+(5*player.getRank()+player.getDollars()+player.getCredits())+"\n";
+        }
+        JOptionPane.showMessageDialog(null, scores);
     }
     public static void popUpMessage(String s){
         JOptionPane.showMessageDialog(null, s);
+    }
+
+
+    public void makeRoomSlots(){
+        Room train = convertToRoom("train station");
+        for(int i = 0; i < 6; i++){
+            train.getSlots().add(new Slot(train.getX()+40*i,train.getY()+train.getH()));
+        }
+        train.getSlots().add(new Slot(train.getX(),train.getY()+train.getH()+45));
+        train.getSlots().add(new Slot(train.getX()+40,train.getY()+train.getH()+45));
+
+        Room saloon = convertToRoom("saloon");
+        for(int i = 0; i < 8; i++){
+            saloon.getSlots().add(new Slot(saloon.getX()+42*i,saloon.getY()+saloon.getH()));
+        }
+
+        Room bank = convertToRoom("bank");
+        for(int i = 0; i < 8; i++){
+            bank.getSlots().add(new Slot(bank.getX()+42*i,bank.getY()+bank.getH()));
+        }
+
+        Room main = convertToRoom("main street");
+        for(int i = 1; i < 9; i++){
+            main.getSlots().add(new Slot((main.getX()+main.getW())-42*i,main.getY()+main.getH()));
+        }
+
+        Room church = convertToRoom("church");
+        for(int i = 0; i < 8; i++){
+            church.getSlots().add(new Slot(church.getX()+42*i,church.getY()+church.getH()));
+        }
+
+        Room secret = convertToRoom("secret hideout");
+        for(int i = 0; i < 8; i++){
+            secret.getSlots().add(new Slot(secret.getX()+42*i,secret.getY()+secret.getH()));
+        }
+
+        Room hotel = convertToRoom("hotel");
+        for(int i = 0; i < 8; i++){
+            hotel.getSlots().add(new Slot(hotel.getX()+42*i,hotel.getY()+hotel.getH()));
+        }
+
+        Room general = convertToRoom("general store");
+        for(int i = 1; i < 9; i++){
+            general.getSlots().add(new Slot((general.getX()+general.getW())-42*i,general.getY()+general.getH()));
+        }
+
+        Room jail = convertToRoom("jail");
+        for(int i = 0; i < 4; i++){
+            jail.getSlots().add(new Slot(jail.getX()+42*i,jail.getY()+jail.getH()));
+        }
+        for(int i = 0; i < 4; i++){
+            jail.getSlots().add(new Slot(jail.getX()+42*i,jail.getY()+jail.getH()+45));
+        }
+
+        Room ranch = convertToRoom("ranch");
+        for(int i = 0; i < 4; i++){
+            ranch.getSlots().add(new Slot(ranch.getX()+42*i,ranch.getY()+ranch.getH()));
+        }
+        for(int i = 0; i < 4; i++){
+            ranch.getSlots().add(new Slot(ranch.getX()+42*i,ranch.getY()+ranch.getH()+45));
+        }
+
+        Room trailer = convertToRoom("trailer");
+        for(int i = 0; i < 4; i++){
+            trailer.getSlots().add(new Slot(trailer.getX()+45*i,trailer.getY()+30));
+        }
+        for(int i = 0; i < 4; i++){
+            trailer.getSlots().add(new Slot(trailer.getX()+45*i,trailer.getY()+30+45));
+        }
+
+        Room office = convertToRoom("office");
+        for(int i = 0; i < 4; i++){
+            office.getSlots().add(new Slot(office.getX()+45*i,office.getY()+30));
+        }
+        for(int i = 0; i < 4; i++){
+            office.getSlots().add(new Slot(office.getX()+45*i,office.getY()+30+45));
+        }
     }
 }

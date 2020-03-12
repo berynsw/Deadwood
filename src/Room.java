@@ -11,10 +11,8 @@ public class Room {
     int h;
     int w;
     int playerCount;
-
-
-
     JButton button;
+    List<Slot> slots = new ArrayList<>();
 
     public Room(String name, List<String> adj, int x, int y, int h, int w) {
         this.name = name;
@@ -27,6 +25,14 @@ public class Room {
     }
 
     public Room() {
+    }
+
+    public List<Slot> getSlots() {
+        return slots;
+    }
+
+    public void setSlots(List<Slot> slots) {
+        this.slots = slots;
     }
 
     public int getPlayerCount() {

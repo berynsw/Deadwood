@@ -19,8 +19,7 @@ public class Deadwood {
     private Office office = null;
     private Player currentPlayer;
     private int playerIndex = 0;
-
-
+    private int budget = 0;
 
     public static Board board;
 
@@ -43,10 +42,16 @@ public class Deadwood {
     public Player getCurrentPlayer() { return currentPlayer; }
     public void setCurrentPlayer(Player currentPlayer) { this.currentPlayer = currentPlayer; }
     public int getDays() { return days; }
+    //public void setBudget(int budget) { this.budget = budget; }
+    public int getBudget() { return budget; }
 
-
-
-
+    public void setPlayerBudget(Player player) {
+        deadwood.sets.forEach((name, set) -> {
+            if (name.equalsIgnoreCase(player.getRoom())) {
+                this.budget = set.getCard().getBudget();
+            }
+        });
+    }
 
     public static void main(String[] args) throws ParserConfigurationException, InterruptedException {
         //populate rooms and cards from xml
@@ -68,21 +73,16 @@ public class Deadwood {
             System.out.println("Error = "+e);
         }
 
-
         board = new Board();
         board.setVisible(true);
-
+        board.makeRoomSlots();
         addPlayers(board.getPlayerNum());
         deadwood.currentPlayer = deadwood.players.get(0);
 
+
         deadwood.initDay();
         board.createTurnButtons();
-
-
     }
-
-
-
 
     public static void endTurn(){
         board.popUpMessage(deadwood.currentPlayer.getName()+"'s turn ended.");
@@ -119,7 +119,7 @@ public class Deadwood {
         if(deadwood.cardsOnBoard <= 1){
             deadwood.days--;
             if(deadwood.days == 0){
-                //display final scores
+                board.endOfGameDialog();
             }
             else{
                 board.endOfDayDialog();
@@ -129,27 +129,10 @@ public class Deadwood {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Adds players to the game
     //  Updates credits, rank, or number of days based on number of players.
     public static void addPlayers(int input) {
-        System.out.println(input);
-        //get number of players from args
         int playerCount = input;
-
-
         //check valid number of players
         if (playerCount < 2 || playerCount > 8) {
             System.out.println("Number of players must be between 2-8.");
@@ -157,19 +140,27 @@ public class Deadwood {
         }
         //initialize player and starting conditions
         for (int i = 0; i < playerCount; i++) {
-            String icon = "images/dice/"+board.getPlayerDice().get(i);
-            deadwood.players.add(new Player("dummy", icon));
+            Player player = new Player("dummy");
+            player.setIconList(board.getDice()[i]);
+
+            String icon = "images/dice/" + player.getIconList()[0];
+            player.setIcon(icon);
             if (playerCount <= 3) {
                 deadwood.days = 3;
-            } else if (playerCount == 5) {
-                deadwood.players.get(i).setCredits(2);
-            } else if (playerCount == 6) {
-                deadwood.players.get(i).setCredits(4);
-            } else if (playerCount >= 7) {
-                deadwood.players.get(i).setRank(2);
             }
+            else if (playerCount == 5) {
+                player.setCredits(2);
+            }
+            else if (playerCount == 6) {
+                player.setCredits(4);
+            }
+            else if (playerCount >= 7) {
+                player.setRank(2);
+                icon = "images/dice/" + player.getIconList()[1];
+                player.setIcon(icon);
+            }
+            deadwood.players.add(player);
         }
-        System.out.println();
     }
 
     // Puts the players in trailer, a card from the deck into every set, and resets cardOnBoard value
@@ -177,11 +168,11 @@ public class Deadwood {
         //put all players in trailer
         for(Player player : deadwood.players){
             player.setRole(null);
-            if(player.getLabel() != null){
-                board.removePlayer(player);
-            }
+
             board.placePlayerInRoom(player,"trailer");
+            //board.initPlayer(player);
         }
+        //board.initPlayer(deadwood.getPlayers());
         //put a card and shots in every set
         deadwood.sets.forEach((name, set) -> {
             set.setCard(deadwood.deck.pop());
@@ -196,43 +187,10 @@ public class Deadwood {
         deadwood.cardsOnBoard = 10;
     }
 
-//    // Calls corresponding player action
-//    public static void takeTurn(Player player, List<Player> players, HashMap<String, Set> sets, Room trailer, Office office) {
-//        System.out.printf("%s it's your turn to play.%n", player.getName());
-//        Scanner scan = new Scanner(System.in);
-//        boolean turn = true;
-//        String input;
-//
-//        while(turn){
-//            System.out.printf("The options are: 'active player', 'all players', 'move', 'work', 'rehearse', 'act', 'upgrade', and 'end'.%n");
-//            input = scan.nextLine().toLowerCase();
-//            switch(input){
-//                case "end":
-//                    turn = false;
-//                    break;
-//                case "act":
-//                    turn = player.act(player, sets.get(player.getRoom()), players);
-//                    break;
-//                case "move":
-//                    turn = player.move(player, sets, trailer, office, scan);
-//                    break;
-//                case "work":
-//                    turn = player.work(player, sets.get(player.getRoom()), scan);
-//                    break;
-//                case "rehearse":
-//                    turn = player.rehearse(player, sets);
-//                    break;
-//                case "upgrade":
-//                    upgrade(office, player, scan);
-//                    break;
-//                default:
-//                    System.out.println("Unrecognized input.");
-//            }
-//        }
-//        System.out.printf("%s's turn ended.%n%n",player.getName());
-//    }
-
-
+    public static Set getCurrentSet(Player player) {
+        HashMap<String, Set> sets = Deadwood.getInstance().getSets();
+        return sets.get(player.getRoom());
+    }
 
     // Returns the list of rooms adjacent to the current location
     //  cases for if the current room is trailer office or set
@@ -262,11 +220,9 @@ public class Deadwood {
             int ranki =  JOptionPane.showOptionDialog(null, "What rank would you like to upgrade to?", "Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, ranks, ranks[0]);
             rank = office.getRank()[ranki];
             if(rank > player.getRank()){
-
                 String[] currencies = {"Dollars", "Credits"};
                 int curri =  JOptionPane.showOptionDialog(null, "Would you like to pay with dollars or credits?", "Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,null, currencies, currencies[0]);
                 String input = currencies[curri];
-
                 if(input.equalsIgnoreCase("dollars")){
                     int dollars = player.getDollars();
                     for(int i = 0; i < 5; i++){
@@ -274,6 +230,9 @@ public class Deadwood {
                             if(dollars >= office.getDollarCost()[i]){
                                 player.setDollars(player.getDollars() - office.getDollarCost()[i]);
                                 player.setRank(rank);
+                                player.setIcon("images/dice/"+player.getIconList()[ranki]);
+                                board.removePlayer(player);
+                                board.placePlayerInRoom(player, "office");
                                 board.popUpMessage("You upgraded to rank "+player.getRank());
                             }
                             else{
@@ -289,6 +248,9 @@ public class Deadwood {
                             if(credits >= office.getCreditCost()[i]){
                                 player.setCredits(player.getCredits() - office.getCreditCost()[i]);
                                 player.setRank(rank);
+                                player.setIcon("images/dice/"+player.getIconList()[rank-1]);
+                                board.removePlayer(player);
+                                board.placePlayerInRoom(player, "office");
                                 board.popUpMessage("You upgraded to rank "+player.getRank());
                             }
                             else{
@@ -297,12 +259,10 @@ public class Deadwood {
                         }
                     }
                 }
-
             }
             else{
                 board.popUpMessage("That's not higher than your current rank!");
             }
-
         }
         else{
             board.popUpMessage("You need to be in the casting office to upgrade.");
@@ -350,8 +310,7 @@ public class Deadwood {
             for (Player player : playersOffCard) {
                 int reward = player.getRole().getRank();
                 player.setDollars(player.getDollars() + reward);
-                System.out.printf("%s receives %d dollars and now has %d dollars.\n",
-                        player.getName(), player.getRole().getRank(), player.getDollars());
+                board.popUpMessage(player.getName()+" received $"+reward);
             }
             //Player highestRole = playersOnCard.get(0);
             while (!dice.isEmpty()) {
@@ -363,9 +322,8 @@ public class Deadwood {
                 int highestDice = dice.remove(dice.size() - 1);
                 for (Player player : playersOnCard) {
                     if (player.getRole() == highestRole) {
-                        System.out.printf("%s receives %d dollars and now has %d dollars.\n",
-                                player.getName(), highestDice, player.getDollars() + highestDice);
                         player.setDollars(player.getDollars() + highestDice);
+                        board.popUpMessage(player.getName()+" received $"+highestDice);
                     }
                 }
             }
