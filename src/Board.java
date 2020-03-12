@@ -85,7 +85,6 @@ public class Board extends JFrame{
 
     }
 
-
     public void removeTurnButtons(){
         bPane.remove(mLabel);
         bPane.remove(bMove);
@@ -144,6 +143,8 @@ public class Board extends JFrame{
         bPane.add(bEnd, new Integer(2));
 
     }
+
+    
     class turnMouseListener implements MouseListener{
         public turnMouseListener(){
         }
@@ -651,7 +652,7 @@ public class Board extends JFrame{
         pRole.setBounds(icon.getIconWidth() + 10, 420, 150, 20);
         bPane.add(pRole, new Integer(2));
 
-        pDays = new JLabel("Day "+Deadwood.getInstance().getDays());
+        pDays = new JLabel("Day: "+Deadwood.getInstance().getDays());
         pDays.setBackground(Color.red);
         pDays.setOpaque(true);
         pDays.setBorder(BorderFactory.createEtchedBorder(0));
